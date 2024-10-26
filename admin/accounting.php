@@ -1,4 +1,4 @@
-    <?php
+<?php
     // Start the session at the very beginning
     session_start();
 
@@ -168,6 +168,11 @@ $stmt->close();
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+      <!-- Font Awesome -->
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+
 </head>
 <body>
     <header>
@@ -177,161 +182,137 @@ $stmt->close();
         </div>
     </header>
 
-    <main>
-       <!-- Burger Menu -->
-<input type="checkbox" class="toggle-Sidebar" id="toggle-Sidebar">
-<label for="toggle-Sidebar" class="toggle-icon">
-    <div class="bar-top"></div>
-    <div class="bar-center"></div>
-    <div class="bar-bottom"></div>
-</label>
-
- <!-- Sidebar -->
-       <!-- Sidebar -->
-       <div class="sidebar">
-            <ul class="menu">
-                <div class="profile">
-                    <a href="#"><img src="img/school-logo.png" alt="school logo"></a>  
-                    <a href="#" id="dashboardLink"><h3>ADMIN DASHBOARD</h3></a>
-                </div>
-
-                <!-- Menu links -->
-                <li><a href="add.php">Add Student</a></li>
-                <li><a href="studentInfo.php" >Student Info</a></li>
-                <li><a href="accounting.php" >Accounting</a></li>
-                <li><a href="#">Logout</a></li>
-            </ul>
-        </div>
+    
+  
 
 
+    <div id="accountingContainer" class="container container3" style="margin-top: 75px; background-color: rgba(255, 255, 255, 0.9); padding: 20px; border-radius: 8px;">
+  
 
 
-
-        <!-- Dashboard Section -->
-        <div class="dashboard" id="dashboardSummary" class="container">
-            <!-- Summary Section -->
-            <div class="dashboard-header text-left mb-4">
-                <h3>Summary</h3>
-            </div>
-            <div class="dashboard-content d-flex justify-content-around flex-wrap  custom-margin">
-                <div class="stat-card">
-                    <img src="img/students.png" alt="student" class="stat-icon">
-                    <h5>Total Students</h5>
-                    <p><?php echo  $total_students ?></p>
-                </div>
-                <div class="stat-card">
-                    <img src="img/earnings.png" alt="earnings" class="stat-icon">
-                    <h5>Total Amount Collected</h5>
-                    <p>₱0</p>
-                </div>
-                <div class="stat-card">
-                    <img src="img/validating-ticket.png" alt="paid" class="stat-icon">
-                    <h5>Paid</h5>
-                    <p>₱0</p>
-                </div>
-                <div class="stat-card">
-                    <img src="img/bill.png" alt="bill" class="stat-icon">
-                    <h5>Unpaid</h5>
-                    <p>₱10</p>
-                </div>
-            </div>
-
-            <!-- Student Records Table -->
-            <div class="table-container" class="container">
-                <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap">
-                    <h3 class="mb-1">Student Records</h3>
-                </div>
-                <!-- Search bar -->
-                <form method="GET" action="result.php">
-                    <div class="search-container d-flex align-items-center mb-3">
-                    <input name="search" type="search" placeholder="Search..." class="form-control me-2" style="max-width: 200px; padding: 15px;">
-
-                        <button class="btn btn-primary">Search</button>
-                    </div>
-                </form>
-
-
-                <!-- Table content -->
-                <div class="table-responsive">
-                    <table class="table table-striped table-bordered table-hover table-sm text-center align-middle">
-                        <thead class="table-dark">
-                            <tr>
-                                <th>Student ID</th>
-                                <th>First Name</th>
-                                <th>Last Name</th>
-                                <th>Gender</th>
-                                <th>Age</th>
-                                <th>Grade</th>
-                                <th>Email</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php while ($r = mysqli_fetch_array($fetch)) { ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($r['studentID']); ?></td>
-                                    <td><?php echo htmlspecialchars($r['fname']); ?></td>
-                                    <td><?php echo htmlspecialchars($r['lname']); ?></td>
-                                    <td><?php echo htmlspecialchars($r['gender']); ?></td>
-                                    <td><?php echo htmlspecialchars($r['age']); ?></td>
-                                    <td><?php echo htmlspecialchars($r['grade']); ?></td>
-                                    <td><?php echo htmlspecialchars($r['email']); ?></td>
-                                    <td>
-                                        <div class="d-flex justify-content-center">
-                                            <a href="view.php" class="btn btn-sm btn-primary me-2">View</a>
-                                        </div>
-                                    </td>
-                                </tr>
-                            <?php } ?>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Pagination (without page numbers) -->
-                <nav aria-label="Page navigation example">
-    <ul class="pagination">
-        <!-- First Page -->
-        <li class="page-item <?= ($page_no <= 1) ? 'disabled' : ''; ?>">
-            <a class="page-link" href="?page_no=1">First</a>
-        </li>
-
-        <!-- Previous Page -->
-        <li class="page-item <?= ($page_no <= 1) ? 'disabled' : ''; ?>">
-            <a class="page-link" href="<?= ($page_no > 1) ? '?page_no=' . $previous_page : '#'; ?>">Previous</a>
-        </li>
-
-        <!-- Next Page -->
-        <li class="page-item <?= ($page_no >= $total_no_of_pages) ? 'disabled' : ''; ?>">
-            <a class="page-link" href="<?= ($page_no < $total_no_of_pages) ? '?page_no=' . $next_page : '#'; ?>">Next</a>
-        </li>
-
-        <!-- Last Page -->
-        <li class="page-item <?= ($page_no >= $total_no_of_pages) ? 'disabled' : ''; ?>">
-            <a class="page-link" href="?page_no=<?= $total_no_of_pages; ?>">Last</a>
-        </li>
-    </ul>
-</nav>
-
-    <!-- Page Info -->
-    <div class="p-2">
-        <strong>Page <?= $page_no; ?> of <?= $total_no_of_pages; ?> </strong>
-    </div>
-
-
-</div> 
-
-        <!-- Footer -->
-        <footer>
-        <div class="footer-content">
-            <p>&copy; Gabila & Canaway 2024 Capstone. All rights reserved.</p>
-        </div>
-    </footer>
-        </div>
-
-
-</main>
+<h3 class="text-left">School Cashier</h3>
 
  
+    <!-- Search bar -->
+    <div class="search-container d-flex align-items-center mb-3">
+                    <input type="search" placeholder="Search..." class="form-control" style="max-width: 200px;">
+                    <button class="btn btn-primary ms-2">Search</button>
+
+                    <div class="container mt-3 d-flex justify-content-end">
+    <a href="dashboard.php" class="btn btn-light btn-sm custom-btn">
+        <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </a>
+</div>
+
+
+
+                </div>
+
+
+    
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <h3 class="personalinfo">Billing Details</h3>
+            <div class="personal-details">
+                <div class="row mb-2">
+                    <div class="col"><strong>ID Number:</strong> <span>2024-2123</span></div>
+                    <div class="col"><strong>Name:</strong> <span>John Doe</span></div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col"><strong>Grade:</strong> <span>1</span></div>
+                    <div class="col"><strong>Email:</strong> <span>sample@gmail.com</span></div>
+                </div>
+                
+                <table class="table table-bordered mt-3 billing-details">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Item</th>
+                            <th>Amount</th>
+                            <th>Item</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Registration:</strong></td>
+                            <td><input type="number" name="registration" value="500" class="form-control" required min="0" step="0.01"></td>
+                            <td><strong>Downpayment:</strong></td>
+                            <td><input type="number" name="downpayment" value="500" class="form-control" required min="0" step="0.01"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Miscellaneous:</strong></td>
+                            <td><input type="number" name="miscellaneous" value="2000" class="form-control" required min="0" step="0.01"></td>
+                            <td><strong>Lab/RLE:</strong></td>
+                            <td><input type="number" name="lab/rle" value="4000" class="form-control" required min="0" step="0.01"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tuition:</strong></td>
+                            <td><input type="number" name="tuition" value="5000" class="form-control" required min="0" step="0.01"></td>
+                            <td><strong>Total:</strong></td>
+                            <td><input type="number" name="total" value="12000" class="form-control" required min="0" step="0.01"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Quarter:</strong></td>
+                            <td>
+                                <select name="quarter" class="form-control" required>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                </select>
+                            </td>
+                            <td><strong>Per Exam:</strong></td>
+                            <td><input type="number" name="exam" value="12000" class="form-control" required min="0" step="0.01"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <h3 class="personalinfo">Update Student Account</h3>
+            <form id="payment-form">
+                <p><strong>Current Balance:</strong> <span id="current-balance">12000</span></p>
+                <h5>Student Clearance</h5>
+                <div class="row mb-3">
+                    <div class="col">
+                        <strong>1st Quarter:</strong>
+                        <select name="first_quarter" class="form-control" required>
+                            <option value="cleared" class="text-success">Cleared</option>
+                            <option value="not_cleared" class="text-danger">Not Cleared</option>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <strong>2nd Quarter:</strong>
+                        <select name="second_quarter" class="form-control" required>
+                            <option value="cleared" class="text-success">Cleared</option>
+                            <option value="not_cleared" class="text-danger">Not Cleared</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <strong>3rd Quarter:</strong>
+                        <select name="third_quarter" class="form-control" required>
+                            <option value="cleared" class="text-success">Cleared</option>
+                            <option value="not_cleared" class="text-danger">Not Cleared</option>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <strong>4th Quarter:</strong>
+                        <select name="fourth_quarter" class="form-control" required>
+                            <option value="cleared" class="text-success">Cleared</option>
+                            <option value="not_cleared" class="text-danger">Not Cleared</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary mt-3">Update</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+
 
 
 </body>
