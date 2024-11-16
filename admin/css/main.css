@@ -1,0 +1,498 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+/* Main content area */
+.main-content {
+    flex: 1; /* This allows the content to grow and push the footer down */
+}
+
+/* Footer styling */
+footer {
+    background: rgb(51,51,51); /* Optional background color */
+    position: relative;
+    text-align: center;
+    padding: 10px;
+    width: 100%;
+}
+
+    footer p {
+        color: white;
+        margin: 0; /* Remove default margin for the footer text */
+    }
+
+    
+html, body {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+body {
+    background: #f1e8e6;
+    font-family: "Montserrat", sans-serif;
+    display: flex;
+    flex-direction: column;
+    background-image: url(../img/bgschool.jpg);
+    background-repeat: no-repeat;
+    background-position: center; 
+    background-size: calc(100% - 5px) calc(100% - 15px);
+    background-attachment: fixed;
+}
+
+/* Header */
+.header {
+    background: red;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+
+
+.mainheader p {
+    font-weight: 500;
+    font-size: 2rem;
+    line-height: 0.9;
+    margin: 0;
+    padding: 10px;
+    color: white;
+    text-transform: uppercase;
+    text-align: center; /* Center-align text inside the <p> element */
+}
+
+
+.subheading {
+    font-size: 1.5rem; /* Subheading font size */
+    color: white;
+    margin-top: 2px; /* Add space between main header and subheading */
+}
+
+
+/*  Side bar*/
+
+
+.profile {
+    padding-top: 50px;
+    text-align: center;
+    padding: 20px 0;
+}
+
+.sidebar{
+    background-color:  rgba(255, 255, 255, 0.7);
+    height: 100%;
+    width: 230px;
+    position: fixed;
+/* margin-top: 60px;*/ 
+    margin-top: 50px; /* para mag sumbay and side bar */
+    transform: translateX(-250px);/* para ma hide and left side bar*/
+    transition: transform  250ms ease-in-out;
+
+}
+
+.profile img{
+    padding-top: 5px;
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    object-position: top;
+    border-radius: 100%;
+   
+}
+
+.profile a h3{
+    color: #0A0A0A;
+    margin-top: 10px;
+    
+}
+
+.profile a{
+    text-decoration: none;
+}
+
+/* Profile section inside sidebar */
+.profile {
+    margin-top: 20px;
+    text-align: center;
+    padding: 20px 0;
+}
+
+.profile img {
+    width: 100px;
+    border-radius: 50%;
+}
+
+.profile h3 {
+    color: #0A0A0A;
+    margin-top: 10px;
+}
+
+
+
+/* Menu items in sidebar */
+.menu {
+    list-style: none;
+    padding: 0;
+    text-transform: uppercase;
+    font-weight: bolder
+   
+}
+
+.sidebar .menu li {
+    text-align: center;
+   
+}
+
+.sidebar .menu li a {
+    color: #000000;
+    text-decoration: none;
+    display: block;
+    padding: 10px;
+    
+    
+}
+.sidebar .menu li a:hover{
+    background-color: white;
+    color: dodgerblue;
+    border-top: 1px solid lightblue; /* Adds a top border */
+    border-bottom: 1px solid lightblue; /* Adds a bottom border */
+    border-left: none; /* Removes left border */
+    border-right: none; /* Removes right border */
+    
+}
+
+
+
+
+/*burger menu mani code */
+
+.toggle-icon div{
+    background: #f1e8e6;
+    width: 100%;
+    height: 3px;
+    transition: all 0.3s;
+}
+
+.toggle-icon{
+    position: fixed; /* Changed from absolute to fixed */
+    top: 22px;
+    left: 15px;
+    width: 22px;
+    height: 22px;
+    z-index: 9999;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.bar-center{
+    margin: 3px 0;
+}
+
+
+
+
+
+/* mao ni ang code mag pa gawas sa sidebar */
+/* When the checkbox is checked, show the sidebar */
+input[type="checkbox"]:checked ~ .sidebar {
+    transform: translateX(0); /* Sidebar appears */
+}
+
+/* When the checkbox is checked, keep the hamburger icon in its initial state */
+input[type="checkbox"]:checked ~ .toggle-icon > .bar-top {
+    transform: rotate(0deg); /* No rotation */
+    margin-top: 0; /* Reset margin */
+}
+
+input[type="checkbox"]:checked ~ .toggle-icon > .bar-center {
+    opacity: 1; /* Keep the center bar visible */
+}
+
+input[type="checkbox"]:checked ~ .toggle-icon > .bar-bottom {
+    transform: rotate(0deg); /* No rotation */
+    margin-top: 0; /* Reset margin */
+}
+
+
+li img{
+    height: 120px;
+    width: 100px;
+    margin-bottom: -30px;
+}
+li .img2{
+    height: 90px;
+    width: 70px;
+    margin-bottom: 5px;
+   
+}
+
+  /* Modal styles para sa logout */
+  .modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0, 0, 0, 0.5); /* Darker background with opacity */
+    backdrop-filter: blur(5px); /* Adds a blur effect to the background */
+}
+
+.modal-content {
+    background-color: #fff; /* White background for modal content */
+    margin: 15% auto; /* Centered vertically and horizontally */
+    padding: 30px;
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+    width: 90%; /* Responsive width */
+    max-width: 400px; /* Maximum width */
+    text-align: center;
+}
+
+.modal-content p {
+    font-size: 1.1em; /* Slightly larger font for message */
+    margin-bottom: 20px; /* Spacing between message and buttons */
+}
+
+.close {
+    margin-bottom: 10px;
+    background-color: #007BFF; /* Bootstrap primary color */
+    color: #fff; /* White text */
+    border: none;
+    border-radius: 5px; /* Rounded corners */
+    padding: 10px 20px; /* Padding for buttons */
+    font-size: 16px; /* Font size */
+    cursor: pointer;
+    transition: background-color 0.3s; /* Smooth background color change */
+}
+
+.close:hover {
+    background-color: #0056b3; /* Darker shade on hover */
+}
+
+#cancelLogout {
+    background-color: #ccc; /* Gray color for cancel button */
+    color: #333; /* Dark text */
+  
+}
+
+#cancelLogout:hover {
+    background-color: #bbb; /* Darker gray on hover */
+}
+
+.main-content{
+    margin-top: 70px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    
+}
+
+
+/* main */   
+ .box{
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 60%;
+ 
+    max-width: 700px;
+    margin: 15px auto;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+ }
+.addStudentForm{
+    width: 90%;
+  padding: 20px;
+  margin-bottom: 50px;
+    border-radius: 8px;
+    background-color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+
+#closeBtn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 24px;
+    color: #333;
+    cursor: pointer;
+}
+
+.modal-title {
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+form label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+form input, form select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 15px;
+}
+
+.custom-file-input {
+    display: none; /* Hide the default file input */
+}
+
+.custom-file-label {
+    display: inline-block; 
+    padding: 10px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+}
+
+
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.col {
+    flex: 1;
+    padding: 0 10px;
+    min-width: 150px;
+}
+
+.btn-submit {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 15px;
+}
+
+.btn-submit:hover {
+    background-color: #0056b3;
+}
+
+#error-message, #success-message {
+    font-weight: bold;
+    text-align: center;
+    margin-top: 15px;
+}
+
+
+
+
+
+
+/* Main content area */
+.main-content {
+    flex: 1; /* This allows the content to grow and push the footer down */
+}
+
+/* Media Queries */
+@media (max-width: 1200px) {
+    .mainheader p {
+        font-size: 1.5rem;
+    }
+
+    .subheading {
+        font-size: 1.2rem;
+    }
+
+    .sidebar {
+        background-color: white;
+        width: 100%;
+        height: auto;
+        transform: translateY(-100%);
+    }
+
+    .dashboard {
+        width: 100%;
+        margin-left: 0;
+    }
+
+    .box {
+        max-width: 100%;
+    }
+
+    .row .col {
+        flex-basis: 100%;
+        padding: 5px 0;
+    }
+}
+
+
+
+
+/* Media Queries */
+@media (max-width: 768px) {
+    .mainheader p {
+        font-size: 1.5rem;
+    }
+
+    .subheading {
+        font-size: 1.2rem;
+    }
+
+    .sidebar {
+        background-color: white;
+        width: 100%;
+        height: auto;
+        transform: translateY(-100%);
+    }
+
+    .dashboard {
+        width: 100%;
+        margin-left: 0;
+    }
+
+    .box {
+        max-width: 100%;
+    }
+
+    .row .col {
+        flex-basis: 100%;
+        padding: 5px 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .mainheader p {
+        font-size: 1.2rem;
+    }
+
+    .subheading {
+        font-size: 1rem;
+    }
+}

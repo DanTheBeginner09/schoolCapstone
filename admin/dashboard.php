@@ -9,6 +9,9 @@
     $errorMessage = "";
     $successMessage = "";
 
+
+    
+
     // Handle form submission
     if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add-student'])) {
         // Collect and sanitize input values
@@ -149,12 +152,70 @@ $stmt->close();
     }
 
     // Summary: Total students enrolled
-    $sql = "SELECT COUNT(studentID) AS total_students FROM students";
-    $result = $con->query($sql);
-    $total_students = $result && $result->num_rows > 0 ? $result->fetch_assoc()['total_students'] : 0;
+$sql_students = "SELECT COUNT(studentID) AS total_students FROM students";
+$result_students = $con->query($sql_students);
 
-    // Close the connection at the end of the script
-    $con->close(); // Ensures all operations are complete
+// Check if the query was successful
+if ($result_students === FALSE) {
+    die("Error in SQL query: " . $con->error);
+}
+
+// Fetch the total number of students
+$row_students = $result_students->fetch_assoc();
+$total_students = isset($row_students['total_students']) ? intval($row_students['total_students']) : 0;
+
+// Step 1: Get the total tuition amount
+$sql_tuition = "SELECT SUM(totalTuition) AS totalTuition FROM students"; // Adjust this query based on your actual table structure
+$result_tuition = $con->query($sql_tuition);
+
+// Check if the query was successful
+if ($result_tuition === FALSE) {
+    die("Error in SQL query: " . $con->error);
+}
+
+// Fetch the total tuition amount
+$row_tuition = $result_tuition->fetch_assoc();
+$total_tuition = isset($row_tuition['totalTuition']) ? floatval($row_tuition['totalTuition']) : 0;
+
+// Step 2: Get the total payment amount
+$sql_paymentAmount = "SELECT SUM(paymentAmount) AS paymentAmount FROM students"; // Adjust this query based on your actual table structure
+$result_paymentAmount = $con->query($sql_paymentAmount);
+
+// Check if the query was successful
+if ($result_paymentAmount === FALSE) {
+    die("Error in SQL query: " . $con->error);
+}
+
+// Fetch the total payment amount
+$row_paymentAmount = $result_paymentAmount->fetch_assoc();
+$total_paymentAmount = isset($row_paymentAmount['paymentAmount']) ? floatval($row_paymentAmount['paymentAmount']) : 0;
+
+// Step 3: Get the count of students with zero balance
+$sql_zero_balance = "SELECT COUNT(studentID) AS remainingbalance FROM students WHERE remainingbalance = 0";
+$result_zero_balance = $con->query($sql_zero_balance);
+
+// Check if the query was successful
+if ($result_zero_balance === FALSE) {
+    die("Error in SQL query: " . $con->error);
+}
+
+// Step 4: Calculate the amount to be collected per student
+$amount_per_student = $total_students > 0 ? $total_tuition / $total_students : 0;
+
+// Output the results
+//echo "Total Students Enrolled: " . $total_students . "<br>";
+//echo "Total Tuition Amount: ₱" . number_format($total_tuition, 2) . "<br>";
+//echo "Total Payment Amount: ₱" . number_format($total_paymentAmount, 2) . "<br>";
+//echo "Amount to be Collected per Student: ₱" . number_format($amount_per_student, 2) . "<br>";
+//echo "Number of Students with Zero Balance: " . $zero_balance_count . "<br>";
+
+// Close the connection at the end of the script
+$con->close(); // Ensures all operations are complete
+
+
+
+
+
     ?>
 
 
@@ -168,6 +229,100 @@ $stmt->close();
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="bootstrap-5.3.3-dist/css/bootstrap.min.css"  type="text/css"   rel="stylesheet">
+    <style>
+
+        /* Basic modal styling */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0, 0, 0, 0.4); /* Background color with transparency */
+    padding-top: 100px;
+}
+
+/* Modal content */
+.modal-content {
+    background-color: #fff;
+    margin: auto;
+    padding: 10px;
+    border: 1px solid #888;
+    border-radius: 8px;
+    width: 30%; /* You can adjust the width as needed */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Modal text */
+.modal-content p {
+    font-size: 16px;
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Button styling */
+button.close {
+    background-color: #f44336; /* Red */
+    color: white;
+    padding: 12px 24px;
+    margin: 5px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+button.close:hover {
+    background-color: #e53935; /* Darker red */
+  
+}
+
+button#cancelLogout {
+   
+    background-color: #4CAF50; /* Green */
+}
+
+button#cancelLogout:hover {
+    background-color: #45a049; /* Darker green */
+}
+
+/* Modal show and hide animation */
+.modal.fade-in {
+    animation: fadeIn 0.3s ease-in;
+}
+
+.modal.fade-out {
+    animation: fadeOut 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+    
+
+        </style>
+
 </head>
 <body>
     <header>
@@ -191,15 +346,15 @@ $stmt->close();
        <div class="sidebar">
             <ul class="menu">
                 <div class="profile">
-                    <a href="#"><img src="img/school-logo.png" alt="school logo"></a>  
-                    <a href="#" id="dashboardLink"><h3>ADMIN DASHBOARD</h3></a>
+                    <a href="dashboard.php"><img src="img/school-logo.png" alt="school logo"></a>  
+                    <a href="dashboard.php" id="dashboardLink"><h3>ADMIN DASHBOARD</h3></a>
                 </div>
 
                 <!-- Menu links -->
                 <li><a href="add.php">Add Student</a></li>
                 <li><a href="studentInfo.php" >Student Info</a></li>
                 <li><a href="accounting.php" >Accounting</a></li>
-                <li><a href="#">Logout</a></li>
+                <li><a href="javascript:void(0);" id="logoutLink">Logout</a></li>
             </ul>
         </div>
 
@@ -216,23 +371,22 @@ $stmt->close();
             <div class="dashboard-content d-flex justify-content-around flex-wrap  custom-margin">
                 <div class="stat-card">
                     <img src="img/students.png" alt="student" class="stat-icon">
-                    <h5>Total Students</h5>
-                    <p><?php echo  $total_students ?></p>
+                    <h5>ENROLLEES</h5>
+                    <p>No. <?php echo  $total_students ?></p>
                 </div>
                 <div class="stat-card">
                     <img src="img/earnings.png" alt="earnings" class="stat-icon">
-                    <h5>Total Amount Collected</h5>
-                    <p>₱0</p>
+                    <h5 class="text-center mb-3" style="color: black; ">COLLECTED FEES</h5>
+                    <p>₱ <?php echo number_format($total_paymentAmount, 2) ?></p>
                 </div>
+               
+            
+
                 <div class="stat-card">
-                    <img src="img/validating-ticket.png" alt="paid" class="stat-icon">
-                    <h5>Paid</h5>
-                    <p>₱0</p>
-                </div>
-                <div class="stat-card">
-                    <img src="img/bill.png" alt="bill" class="stat-icon">
-                    <h5>Unpaid</h5>
-                    <p>₱10</p>
+                    <img src="img/invoice.png" alt="bill" class="stat-icon">
+                    <h5 class="text-center mb-3" style="color: black; ">TO BE COLLECT</h5>
+
+                    <p>₱  <?php echo number_format($total_tuition, 2) ?></p>
                 </div>
             </div>
 
@@ -242,13 +396,11 @@ $stmt->close();
                     <h3 class="mb-1">Student Records</h3>
                 </div>
                 <!-- Search bar -->
-                <form method="GET" action="result.php">
-                    <div class="search-container d-flex align-items-center mb-3">
-                    <input name="search" type="search" placeholder="Search..." class="form-control me-2" style="max-width: 200px; padding: 15px;">
 
-                        <button class="btn btn-primary">Search</button>
-                    </div>
-                </form>
+                <form action="result.php" method="GET" class="mb-4 d-flex" style="max-width: 300px;">
+    <input name="search" type="search" placeholder="Search by ID..." class="form-control me-2" style="padding: 15px;">
+    <button type="submit" class="btn btn-primary" style="height: 40px; padding: 0 20px;">Search </button>
+        </form>
 
 
                 <!-- Table content -->
@@ -256,30 +408,49 @@ $stmt->close();
                     <table class="table table-striped table-bordered table-hover table-sm text-center align-middle">
                         <thead class="table-dark">
                             <tr>
+                          
                                 <th>Student ID</th>
                                 <th>First Name</th>
                                 <th>Last Name</th>
                                 <th>Gender</th>
                                 <th>Age</th>
                                 <th>Grade</th>
+                                <th>Section</th> 
                                 <th>Email</th>
+                                <th>School Year</th>
+                                <th>Current Balance</th>
+                                <th>Paid Amount</th>
+                                <th>Total Tuition</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php while ($r = mysqli_fetch_array($fetch)) { ?>
                                 <tr>
+                               
                                     <td><?php echo htmlspecialchars($r['studentID']); ?></td>
                                     <td><?php echo htmlspecialchars($r['fname']); ?></td>
                                     <td><?php echo htmlspecialchars($r['lname']); ?></td>
                                     <td><?php echo htmlspecialchars($r['gender']); ?></td>
                                     <td><?php echo htmlspecialchars($r['age']); ?></td>
-                                    <td><?php echo htmlspecialchars($r['grade']); ?></td>
+                                    <td><?php echo htmlspecialchars($r['grade']); ?></td>   
+                                    <td><?php echo htmlspecialchars($r['section']); ?></td> 
                                     <td><?php echo htmlspecialchars($r['email']); ?></td>
+                                    <td><?php echo htmlspecialchars($r['school_year']); ?></td>
+                                    <td><?php echo htmlspecialchars($r['remainingbalance']); ?></td>
+                                    <td><?php echo htmlspecialchars($r['paymentAmount']); ?></td>
+                                    <td><?php echo htmlspecialchars($r['totalTuition']); ?></td>
                                     <td>
                                         <div class="d-flex justify-content-center">
-                                            <a href="view.php" class="btn btn-sm btn-primary me-2">View</a>
-                                        </div>
+        <a href="view.php?ID=<?php echo htmlspecialchars($r['accountID']); ?>" class="btn btn-sm btn-primary me-2">View Info</a>
+        <a href="update.php?ID=<?php echo htmlspecialchars($r['accountID']); ?>" class="btn btn-sm btn-secondary me-2">Update</a>
+                            <!--Hide Delete-->
+                            <a href="delete.php?ID=<?php echo htmlspecialchars($r['accountID']); ?>" class="btn btn-sm btn-danger" style="display:none;">Delete</a>
+
+
+
+
+                            </div>
                                     </td>
                                 </tr>
                             <?php } ?>
@@ -320,31 +491,35 @@ $stmt->close();
 
 </div> 
 
-        <!-- Footer -->
-        <footer>
-        <div class="footer-content">
-            <p>&copy; Gabila & Canaway 2024 Capstone. All rights reserved.</p>
-        </div>
-    </footer>
-        </div>
-
+      
 
 </main>
 
+   <!-- Footer -->
+    <!-- Footer -->
+ <footer class="footer bg-dark text-light text-center py-2">
+        <p>&copy; Carlgeline Gabilla & Jessa Mae Canaway Capstone Project  2024. All rights reserved.</p>
+    </footer>
+
+    
  
+    <!-- Logout Modal -->
+    <div id="logoutModal" class="modal">
+        <div class="modal-content">
+            <p>Are you sure you want to logout?</p>
+            <button id="confirmLogout" class="close">Yes, Logout</button>
+            <button id="cancelLogout" class="close">Cancel</button>
+        </div>
+    </div>
 
 
-</body>
 
+
+</body> <!-- JavaScript for Modal -->
+<script src="bootstrap-5.3.3-dist/js/bootstrap.min.js"></script>
 <script src="javascript/script.js">
 
-
-
-
-
-
 </script>
-
 
 
 </html>

@@ -217,23 +217,26 @@ body {
 
 
 /* mao ni ang code mag pa gawas sa sidebar */
-input[type="checkbox"]:checked ~ .sidebar{
-    transform: translateX(0);
+/* When the checkbox is checked, show the sidebar */
+input[type="checkbox"]:checked ~ .sidebar {
+    transform: translateX(0); /* Sidebar appears */
 }
 
-input[type="checkbox"]:checked ~ .toggle-icon > .bar-top{
-    transform: rotate(135deg);
-    margin-top: 8px;
+/* When the checkbox is checked, keep the hamburger icon in its initial state */
+input[type="checkbox"]:checked ~ .toggle-icon > .bar-top {
+    transform: rotate(0deg); /* No rotation */
+    margin-top: 0; /* Reset margin */
 }
 
-input[type="checkbox"]:checked ~ .toggle-icon > .bar-center{
-    opacity: 0;
+input[type="checkbox"]:checked ~ .toggle-icon > .bar-center {
+    opacity: 1; /* Keep the center bar visible */
 }
 
-input[type="checkbox"]:checked ~ .toggle-icon > .bar-bottom{
-    transform: rotate(-135deg);
-    margin-top: -12px;
+input[type="checkbox"]:checked ~ .toggle-icon > .bar-bottom {
+    transform: rotate(0deg); /* No rotation */
+    margin-top: 0; /* Reset margin */
 }
+
 
 li img{
     height: 120px;
@@ -380,10 +383,12 @@ padding: 10px;
         
         
                 .container {
+
                     width: 100%;
                     max-width: 500px;
-                    padding: 40px;
+                    padding: 30px;
                     margin: 10px;
+                    margin-top: 10px;
                     background: #ffffff;
                     border-radius: 10px;
                     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -394,6 +399,7 @@ padding: 10px;
                     font-size: 24px;
                     color: #333;
                     margin-bottom: 20px;
+                    margin-top: -10px;
                 }
         
                /* Form styles */

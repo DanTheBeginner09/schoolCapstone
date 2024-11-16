@@ -1,166 +1,123 @@
 <?php
-// Start the session at the very beginning
 session_start();
-
 include_once("dbconnection/connect.php");
-$con = connection(); // Establish database connection
+$con = connection();
 
-// Initialize messages
 $errorMessage = "";
 $successMessage = "";
 
 // Function to check if email already exists
 function checkEmailExists($email, $con) {
-    // Prepare the SQL statement
     $stmt = $con->prepare("SELECT COUNT(*) FROM students WHERE email = ?");
+    if ($stmt === false) {
+        die('Prepare failed: ' . $con->error);
+    }
     $stmt->bind_param("s", $email);
     $stmt->execute();
     $stmt->bind_result($count);
     $stmt->fetch();
     $stmt->close();
-
-    return $count > 0; // Returns true if email exists
+    return $count > 0;
 }
 
-// Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add-student'])) {
-    // Collect and sanitize input values
+    // Sanitize input values
     $fname = $con->real_escape_string($_POST['fname']);
     $lname = $con->real_escape_string($_POST['lname']);
     $gender = $con->real_escape_string($_POST['gender']);
-    $age = (int)$_POST['age']; // Cast to integer for safety
+    $age = (int)$_POST['age'];
     $studentEmail = $con->real_escape_string($_POST['studentEmail']);
     $schoolYear = $con->real_escape_string($_POST['schoolYear']);
-    $grade = isset($_POST['grade']) ? $con->real_escape_string($_POST['grade']) : ''; // Check for existence
+    $grade = (int)$con->real_escape_string($_POST['grade']);  // Ensure grade is an integer
+    $section = $con->real_escape_string($_POST['section']);
+    $date = date("Y-m-d");
 
-    // Initialize error message variable
-    $errorMessage = '';
-
-    // Check if the email already exists
+    // Check if email already exists
     if (checkEmailExists($studentEmail, $con)) {
         $errorMessage = "Email already in use. Please enter another email.";
     } else {
-        // Handle file upload if a file is selected
-        $uploadFile = null; // Initialize variable
-        if (isset($_FILES['myfile']) && $_FILES['myfile']['error'] == UPLOAD_ERR_OK) {
-            // Set the upload directory
-            $uploadDir = 'uploads/'; // Ensure this directory exists
+        // Generate studentID based on the current year and the last ID used
+        $currentYear = date("Y");
+        $stmt = $con->prepare("SELECT MAX(studentID) as last_id FROM students WHERE studentID LIKE ?");
+        if ($stmt === false) {
+            die('Prepare failed: ' . $con->error);
+        }
+        $likePattern = $currentYear . '-%';
+        $stmt->bind_param("s", $likePattern);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
 
-            // Create the directory if it doesn't exist
-            if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0755, true);
-            }
+        $lastID = isset($row['last_id']) ? $row['last_id'] : '';
+        $nextID = 1;
 
-            $uploadFile = $uploadDir . basename($_FILES['myfile']['name']);
-
-            // Move the uploaded file to the designated directory
-            if (!move_uploaded_file($_FILES['myfile']['tmp_name'], $uploadFile)) {
-                $errorMessage = "File upload failed.";
+        if ($lastID) {
+            $parts = explode('-', $lastID);
+            if (count($parts) == 2 && $parts[0] == $currentYear) {
+                $nextID = intval($parts[1]) + 1;
             }
         }
 
-        // Only proceed if there was no error during file upload
-        if (empty($errorMessage)) {
-            // Auto-generate the StudentID in the format "2024-0000"
-            $currentYear = date("Y");
-            $stmt = $con->prepare("SELECT MAX(studentID) as last_id FROM students WHERE studentID LIKE ?");
-            $likePattern = $currentYear . '-%'; // Match IDs for the current year
-            $stmt->bind_param("s", $likePattern);
+        $studentID = $currentYear . '-' . str_pad($nextID, 4, '0', STR_PAD_LEFT);
 
-            if ($stmt) {
-                $stmt->execute();
-                $result = $stmt->get_result();
-                $row = $result->fetch_assoc();
-                
-                // Get the last studentID
-                $lastID = isset($row['last_id']) ? $row['last_id'] : '';
-                $nextID = 1; // Default to 1 if there's no lastID
-                
-                // Extract the numeric part and increment
-                if ($lastID) {
-                    $parts = explode('-', $lastID);
-                    if (count($parts) == 2 && $parts[0] == $currentYear) {
-                        $nextID = intval($parts[1]) + 1; // Increment the last four digits
-                    }
-                }
-                
-                // Generate the new StudentID
-                $studentID = $currentYear . '-' . str_pad($nextID, 4, '0', STR_PAD_LEFT); // Ensure 4 digits
-            } else {
-                $errorMessage = "Failed to prepare SQL for fetching last ID: " . $con->error;
+        // Prepare and execute the insert query for student data
+        $stmt = $con->prepare("INSERT INTO students (fname, lname, gender, age, studentID, email, school_year, grade, section, date, totalTuition, remainingBalance, paymentAmount, status) 
+                               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        if ($stmt === false) {
+            die('Prepare failed: ' . $con->error);
+        }
+
+        // Set default values for tuition and payments
+        $totalTuition = 12000;
+        $remainingBalance = 12000;
+        $paymentAmount = 0;
+        $status = 'Active';
+
+        // Bind parameters for the student insert query
+        $stmt->bind_param("sssiissssdddds", 
+            $fname, 
+            $lname, 
+            $gender, 
+            $age, 
+            $studentID, 
+            $studentEmail, 
+            $schoolYear, 
+            $grade, 
+            $section, 
+            $date, 
+            $totalTuition, 
+            $remainingBalance, 
+            $paymentAmount, 
+            $status
+        );
+
+        // Execute and check for successful insertion
+        if ($stmt->execute()) {
+            $successMessage = "Student successfully added.";
+
+            // Insert default values into the payment table
+            $accountID = $studentID;  // Using studentID as accountID
+            $stmt = $con->prepare("INSERT INTO payment (accountID, status_1st_quarter, status_2nd_quarter, status_3rd_quarter, status_4th_quarter, registration, miscellaneous, tuition, quarter, downpayment, lab_rle, per_exam, total) 
+                                   VALUES (?, 'Unpaid', 'Unpaid', 'Unpaid', 'Unpaid', 0, 0, 12000, 1, 0, 0, 0, 12000)");
+            if ($stmt === false) {
+                die('Prepare failed: ' . $con->error);
             }
 
-            // Prepare SQL statement based on whether a file was uploaded
-            if ($uploadFile) {
-                $stmt = $con->prepare("INSERT INTO students (fname, lname, gender, age, studentID, email, school_year, grade, import_file) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                $stmt->bind_param("sssiissss", $fname, $lname, $gender, $age, $studentID, $studentEmail, $schoolYear, $grade, $uploadFile);
-            } else {
-                $stmt = $con->prepare("INSERT INTO students (fname, lname, gender, age, studentID, email, school_year, grade) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-                $stmt->bind_param("sssiisss", $fname, $lname, $gender, $age, $studentID, $studentEmail, $schoolYear, $grade);
-            }
-
-            // Check if the statement preparation was successful
-            if (!$stmt) {
-                die("Error preparing SQL statement: " . $con->error);
-            }
-
-            // Execute the statement
+            $stmt->bind_param("s", $accountID);
             if ($stmt->execute()) {
-                $successMessage = "Student added successfully!";
+                $successMessage .= " Payment details initialized.";
             } else {
-                $errorMessage = "Error adding student: " . $stmt->error;
+                $errorMessage = "Failed to initialize payment details.";
             }
-
-            // Close the statement
-            $stmt->close();
+        } else {
+            $errorMessage = "Failed to add student. Please try again.";
         }
+
+        $stmt->close();
     }
 }
 
-// Pagination Logic
-$page_no = 1;
-if (isset($_GET['page_no']) && is_numeric($_GET['page_no']) && $_GET['page_no'] > 0) {
-    $page_no = (int)$_GET['page_no'];
-}
-
-// Calculate previous and next pages
-$previous_page = $page_no - 1;
-$next_page = $page_no + 1;
-
-$total_records_per_page = 5; // Records per page
-$offset = ($page_no - 1) * $total_records_per_page;
-
-// Count total records
-$sql_count = "SELECT COUNT(*) as total_records FROM students";
-$result_count = mysqli_query($con, $sql_count);
-$total_records = 0;
-if ($result_count) {
-    $row = mysqli_fetch_assoc($result_count);
-    $total_records = $row['total_records'];
-}
-
-// Calculate total pages
-$total_no_of_pages = ceil($total_records / $total_records_per_page);
-
-// Fetch paginated records using prepared statements
-$sql = "SELECT * FROM students ORDER BY studentID DESC LIMIT ?, ?";
-$stmt_fetch = $con->prepare($sql);
-if ($stmt_fetch) {
-    $stmt_fetch->bind_param("ii", $offset, $total_records_per_page);
-    $stmt_fetch->execute();
-    $fetch = $stmt_fetch->get_result();
-} else {
-    $fetch = false;
-    $errorMessage = "Error preparing the statement for fetching records.";
-}
-
-// Summary: Total students enrolled
-$sql = "SELECT COUNT(studentID) AS total_students FROM students";
-$result = $con->query($sql);
-$total_students = $result && $result->num_rows > 0 ? $result->fetch_assoc()['total_students'] : 0;
-
-// Close the connection at the end of the script
-$con->close(); // Ensures all operations are complete
+$con->close();
 ?>
 
 
@@ -170,181 +127,168 @@ $con->close(); // Ensures all operations are complete
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>School Fees Management</title>
-    <link rel="stylesheet" href="css/style.css">
-    <!-- Bootstrap CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-
-      <!-- Font Awesome -->
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
-
+    <link rel="stylesheet" href="css/main.css">
+    <link href="bootstrap-5.3.3-dist/css/bootstrap.min.css" type="text/css" rel="stylesheet">
 </head>
 <body>
-    <header>
-        <div class="mainheader">
-            <p>Web-based School Fees <br>
-            <span class="subheading">Management System</span></p>
-        </div>
-    </header>
-
-    
-    <!-- Add Student Container -->
-    <div id="addStudentContainer" class="container container1" style="margin-top: 70px;">
-
-
-
-    <div class="d-flex justify-content-center align-items-start mb-2 flex-wrap">
-        <!-- Add Student Modal Content -->
-        <div class="box">
-
-            <!-- Display Success and Error Messages -->
-<?php if (!empty($successMessage)) : ?>
-    <div id="success-message" class="alert alert-success mt-3">
-        <?php echo htmlspecialchars($successMessage); ?>
+<div class="header">
+    <div class="mainheader">
+        <p>Web-based school fees <br><span class="subheading">MANAGEMENT SYSTEM</span></p>
     </div>
-    <script>
-        // Automatically hide the success message after 5 seconds
-        setTimeout(function() {
-            document.getElementById('success-message').style.display = 'none';
-        }, 5000);
-    </script>
-<?php endif; ?>
+</div>
 
-<?php if (!empty($errorMessage)) : ?>
-    <div id="error-message" class="alert alert-danger mt-3">
-        <?php echo htmlspecialchars($errorMessage); ?>
+<input type="checkbox" class="toggle-Sidebar" id="toggle-Sidebar">
+<label for="toggle-Sidebar" class="toggle-icon">
+    <div class="bar-top"></div>
+    <div class="bar-center"></div>
+    <div class="bar-bottom"></div>
+</label>
+
+<div class="sidebar">
+    <div class="profile">
+        <a href="dashboard.php"><img src="img/school-logo.png" alt="school logo"></a>  
+        <a href="dashboard.php"><h3>ADMIN DASHBOARD</h3></a>
     </div>
-    <script>
-        // Automatically hide the error message after 5 seconds
-        setTimeout(function() {
-            document.getElementById('error-message').style.display = 'none';
-        }, 5000);
-    </script>
-<?php endif; ?>
+    <ul class="menu">
+        
+    <li><a href="add.php">Add Student</a></li>
+                <li><a href="studentInfo.php" >Student Info</a></li>
+                <li><a href="accounting.php" >Accounting</a></li>
+                <li><a href="javascript:void(0);" id="logoutLink">Logout</a></li>
+    </ul>
+</div>
 
-
-            <div class="modal-content" id="modal">
-     
-
-
-        <h2 class="modal-title" style="margin-bottom: 20px;">Add Student</h2>
-
-                
-
-                <form id="addStudentForm" action="#addStudentContainer" method="POST" enctype="multipart/form-data">
-                    <div class="row">
-                        
-
-                        <div class="col">
-                            <label for="fname" class="lblName">First Name:</label>
-                            <input type="text" id="fname" name="fname" required>
-                        </div>
-                        <div class="col">
-                            <label for="lname">Last Name:</label>
-                            <input type="text" id="lname" name="lname" required>
-                        </div>  
-                    </div>
-
-                    <div class="row">
-                        <div class="col">
-                            <label for="gender">Gender:</label>
-                            <select id="gender" name="gender" required>
-                                <option value=""></option>
-                                <option value="M">Male</option>
-                                <option value="F">Female</option>
-                            </select>
-                        </div>
-                        <div class="col">
-                            <label for="age">Age:</label>
-                            <input type="number" id="age" name="age" required>
-                        </div>
-                    </div>
-
-                    <div class="row">
-
+<div class="main-content">
+    <div class="box">
+        <h2 class="modal-title" style="margin-bottom: 20px;">ADD STUDENT FORM</h2>
+        <div class="addStudentForm">
+            <form action="" method="POST" enctype="multipart/form-data">
+                <div class="row">
                     <div class="col">
-                            <label for="grade">Grade:</label>
-                            <select id="grade" name="grade" required>
+                        <label for="date" class="lblName">Date:</label>
+                        <input type="text" id="date" name="date" value="<?php echo date("Y-m-d"); ?>" readonly>
+                    </div>
+                    <div class="col">
+                        <label for="studentID">Student ID:</label>
+                        <input type="text" id="studentID" name="studentID" 
+                               value="<?php echo isset($studentID) ? htmlspecialchars($studentID) : ''; ?>" 
+                               placeholder="Auto-filled Student ID" readonly>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <label for="fname" class="lblName">First Name:</label>
+                        <input type="text" id="fname" name="fname" required style="text-transform: capitalize;">
+
+                    </div>
+                    <div class="col">
+                        <label for="lname">Last Name:</label>
+                        <input type="text" id="lname" name="lname" required style="text-transform: capitalize;">
+                    </div>  
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <label for="gender">Gender:</label>
+                        <select id="gender" name="gender" required style="text-transform: capitalize;">
                             <option value=""></option>
-                <option value="Grade 1">Grade 1</option>
-                <option value="Grade 2">Grade 2</option>
-                <option value="Grade 3">Grade 3</option>
-                <option value="Grade 4">Grade 4</option>
-                <option value="Grade 5">Grade 5</option>
-                <option value="Grade 6">Grade 6</option>
-                <option value="Grade 7">Grade 7</option>
-                <option value="Grade 8">Grade 8</option>
-                <option value="Grade 9">Grade 9</option>
-                <option value="Grade 10">Grade 10</option>
-                <option value="Grade 11">Grade 11</option>
-                <option value="Grade 12">Grade 12</option>
-                            </select>
-                        </div>
-                                
-
-
-
-                        <div class="col">
-                            <label for="studentEmail">Email:</label>
-                            <input type="email" id="studentEmail" name="studentEmail" required>
-                        </div>
-                       
-
-                        
-             </div>
-                    <div class="row">
-                         
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                    </div>
                     <div class="col">
-    <label for="studentID">Student ID:</label>
-    <input type="text" id="studentID" name="studentID" 
-       value="<?php echo isset($studentID) ? htmlspecialchars($studentID) : ''; ?>" 
-       placeholder="Auto-filled Student ID" readonly>
+                        <label for="age">Age:</label>
+                        <input type="number" id="age" name="age" required> 
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <label for="grade">Grade:</label>
+                        <select id="grade" name="grade" required >
+                            <option value=""></option>
+                            <option value="1">Grade 1</option>
+                            <option value="2">Grade 2</option>
+                            <option value="3">Grade 3</option>
+                            <!-- Add other grades as needed -->
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label for="studentEmail">Email:</label>
+                        <input type="email" id="studentEmail" name="studentEmail" required >
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <label for="section">Section:</label>
+                        <select id="section" name="section" required style="text-transform: capitalize;">
+                            <option value=""></option>
+                            <option value="Rambutan">Rambutan</option>
+                            <option value="Lansones">Lansones</option>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label for="schoolYear">School Year:</label>
+                        <select id="schoolYear" name="schoolYear" required style="text-transform: capitalize;">
+                            <option value=""></option>
+                            <option value="SY 2024-2025">SY 2024-2025</option>
+                            <option value="SY 2025-2026">SY 2025-2026</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="btn-submit" name="add-student">Submit</button>
+            </form>
 
-</div>
-
-<div class="col">
-    <label for="schoolYear">School Year:</label>
-    <select id="schoolYear" name="schoolYear" required>
-        <option value="SY 2024-2025">SY 2024-2025</option>
-        <option value="SY 2025-2026">SY 2025-2026</option>
-    </select>
-</div>
-
-<div class="col">
-    <label for="myfile" class="lblImport">Import Data (Optional):</label>
-    <input type="file" id="myfile" name="myfile">
-</div>
-</div>
+            <?php if (!empty($errorMessage)) : ?>
+                <div id="errorMessage" class="alert alert-danger"><?php echo $errorMessage; ?></div>
+            <?php elseif (!empty($successMessage)) : ?>
+                <div id="successMessage" class="alert alert-success"><?php echo $successMessage; ?></div>
+            <?php endif; ?>
 
 
-                    <button type="submit" class="btn-submit" name="add-student">SAVE</button>
-
-                    <div class="container mt-3 d-flex justify-content-center">
-    <a href="dashboard.php" class="btn btn-light btn-sm">
-        <i class="fas fa-arrow-left"></i> Back to Dashboard
-    </a>
-</div>
-
-                </form>
-            </div>
         </div>
     </div>
 </div>
 
+<!-- Footer -->
+<footer class="footer bg-dark text-light text-center py-2 mt-5">
+        <p>&copy; Carlgeline Gabilla & Jessa Mae Canaway Capstone Project  2024. All rights reserved.</p>
+    </footer>
 
+
+    <!-- Logout Modal -->
+<div id="logoutModal" class="modal">
+    <div class="modal-content">
+        <p>Are you sure you want to logout?</p>
+        <button id="confirmLogout" class="close">Yes, Logout</button>
+        <button id="cancelLogout" class="close">Cancel</button>
+    </div>
+</div>
 
 </body>
 
-<script src="javascript/script.js">
+<script src="javascript/script.js"></script>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Check if the errorMessage or successMessage exists
+        var errorMessage = document.getElementById('errorMessage');
+        var successMessage = document.getElementById('successMessage');
 
+        // If either message exists (error or success)
+        if (errorMessage || successMessage) {
+            // Set a timeout to hide them after 4 seconds
+            setTimeout(function() {
+                if (errorMessage) {
+                    errorMessage.style.display = 'none';
+                }
 
-
-
-
+                if (successMessage) {
+                    successMessage.style.display = 'none';
+                }
+            }, 3000); // 4000 milliseconds = 4 seconds
+        }
+    });
 </script>
 
 
-
+<script src="bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js"></script>
 </html>
