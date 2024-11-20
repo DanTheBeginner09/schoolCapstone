@@ -1,3 +1,38 @@
+<?php
+session_start();
+
+// Include the database connection file
+include_once("../dbconnection/connect.php"); // Adjust path as needed
+$con = connection(); // Establish the database connection
+
+if (isset($_GET['ID'])) {
+    $accountID = $_GET['ID'];
+
+    $sql = "SELECT * FROM students WHERE accountID = ?";
+    $stmt = $con->prepare($sql);
+
+    if ($stmt) {
+        $stmt->bind_param("i", $accountID);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $student = $result->fetch_assoc();
+
+        if ($student) {
+            // echo "<h2>Student Details</h2>";
+            // echo "<p><strong>First Name:</strong> " . htmlspecialchars($student['fname']) . "</p>";
+            // echo "<p><strong>Last Name:</strong> " . htmlspecialchars($student['lname']) . "</p>";
+        } else {
+            echo "No student found with the provided account ID.";
+        }
+    } else {
+        echo "Failed to prepare the SQL statement.";
+    }
+} else {
+    echo "No account ID provided.";
+}
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -38,13 +73,13 @@
               <tr>
                 <td>
                   ISSUED TO:<br />
-                  Name: Daniel Villanueva<br />
-                  EMAIL: villanuevadanzen090923@gmail.com
+                  Name: <strong> <?php echo htmlspecialchars($student['fname']); ?> <?php echo htmlspecialchars($student['lname']); ?>.</strong><br />
+                  EMAIL: <strong> <?php echo htmlspecialchars($student['email']); ?></strong>
                 </td>
                 <td>
-                  DATE: Jan 27, 2024<br />
-                  ID NUMBER: 2024-2023<br />
-                  Grade Level: 9
+                  DATE: <strong> <?php echo htmlspecialchars($student['date']); ?></strong> <br />
+                  ID NUMBER: <strong> <?php echo htmlspecialchars($student['studentID']); ?></strong><br />
+                  Grade Level: <strong> <?php echo htmlspecialchars($student['grade']); ?></strong>
                 </td>
               </tr>
             </table>
@@ -55,24 +90,18 @@
           <td>Remarks</td>
         </tr>
         <tr class="item">
-          <td>Registration:</td>
-          <td>500</td>
+          <td>Payment Amount</td>
+          <td><strong> <?php echo htmlspecialchars($student['paymentAmount']); ?></strong></td>
         </tr>
+        
         <tr class="item last">
-          <td>Miscellaneous:</td>
-          <td>2000</td>
+          <td>Remaining Balance:</td>
+          <td><strong> <?php echo htmlspecialchars($student['remainingbalance']); ?></strong></td>
         </tr>
-        <tr class="item last">
-          <td>Downpayment:</td>
-          <td>2000</td>
-        </tr>
-        <tr class="item last">
-          <td>Tuition:</td>
-          <td>2000</td>
-        </tr>
+     
         <tr class="total">
           <td></td>
-          <td>Total : P385.00</td>
+          <td>Total Paid: Php <strong> <?php echo htmlspecialchars($student['paymentAmount']); ?></strong></td>
         </tr>
       </table>
     </div>

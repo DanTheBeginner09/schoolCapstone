@@ -148,7 +148,7 @@ $con->close();
     </div>
 
 
-
+<!-- 
 <div class="transaction">
   <div class="transaction-item">
     <img src="img/file 1.png" alt="Payment per exam">
@@ -162,7 +162,7 @@ $con->close();
     <img src="img/file 1.png" alt="Remaining balance">
     <a href="#"><p>Remaining balance</p></a>
   </div>
-</div>
+</div> -->
 
 
 </div>
@@ -172,7 +172,7 @@ $con->close();
 
  <!-- Footer -->
  <footer class="footer bg-dark text-light text-center py-2 mt-5">
-        <p>&copy; Daniel C. Villanueva 2024 Capstone. All rights reserved.</p>
+        <p>&copy; Carlgeline Gabila & Jessabel Canaway 2024 Capstone. All rights reserved.</p>
     </footer>
 
 

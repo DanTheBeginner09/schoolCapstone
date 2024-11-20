@@ -163,7 +163,7 @@ $con->close();
 
  <!-- Footer -->
  <footer class="footer bg-dark text-light text-center py-2 mt-5">
-        <p>&copy; Carlgeline Gabilla & Jessa Mae Canaway 2024 Capstone. All rights reserved.</p>
+        <p>&copy; Carlgeline Gabila & Jessabel Canaway 2024 Capstone. All rights reserved.</p>
     </footer>
 
 

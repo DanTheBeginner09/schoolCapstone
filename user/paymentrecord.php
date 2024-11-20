@@ -160,7 +160,7 @@ tr:nth-child(even) {
     <p>PAYMENT RECORDS</p>
     </div>
 
-    <div class="transaction">
+    <!-- <div class="transaction">
         
 
 <table>
@@ -190,6 +190,23 @@ tr:nth-child(even) {
     <td>partial</td>
   </tr>
 </table>
+</div> -->
+
+
+
+<div class="transaction">
+  <div class="transaction-item">
+    <img src="img/file 1.png" alt="Payment per exam">
+    <a href="#"><p>Payment per exam</p></a>
+  </div>
+  <div class="transaction-item">
+    <a href="javascript-print/index.php"><img src="img/file 1.png" alt="Invoice"></a>
+    <a href="javascript-print/index.php">Invoice</a>
+  </div>
+  <div class="transaction-item">
+    <img src="img/file 1.png" alt="Remaining balance">
+    <a href="#"><p>Remaining balance</p></a>
+  </div>
 </div>
 
 
@@ -200,7 +217,7 @@ tr:nth-child(even) {
 
  <!-- Footer -->
  <footer class="footer bg-dark text-light text-center py-2 mt-5">
-        <p>&copy; Daniel C. Villanueva 2024 Capstone. All rights reserved.</p>
+        <p>&copy; Carlgeline Gabila & Jessabel Canaway 2024 Capstone. All rights reserved.</p>
     </footer>
 
 

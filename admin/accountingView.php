@@ -62,6 +62,66 @@ $con->close(); // Ensures all operations are complete
         table { width: 100%; border-collapse: collapse; font-size: 18px; text-align: center; margin: 20px 0; }
         th, td { padding: 5px; border: 1px solid #ddd; }
         th { background-color: #f4f4f4; }
+
+       /* The Modal (background) */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    background-color: rgba(0, 0, 0, 0.5); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+    background-color: white;
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 8px;
+    width: 300px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+/* The Close Button */
+.closeX {
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    cursor: pointer;
+}
+
+.closeX:hover,
+.closeX:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Style the status buttons */
+.status-buttons {
+    margin-top: 20px;
+}
+
+/* Custom styles for the status buttons */
+.status-btn {
+    width: 100%;
+    margin: 5px 0;
+}
+
+/* Text for the current status */
+#statusText {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}
+
     </style>
 </head>
 <body>
@@ -126,10 +186,11 @@ $con->close(); // Ensures all operations are complete
                                     <td><?php echo htmlspecialchars($row['school_year']); ?></td>
                                     <td> 
                                     <a href="payment2.php?ID=<?php echo htmlspecialchars($row['accountID']); ?>" class="btn btn-sm btn-primary me-2">UPDATE AMOUNT</a>
-                                    <a href="payment2.php?ID=<?php echo htmlspecialchars($row['accountID']); ?>" class="btn btn-sm btn-primary me-2">SOA</a>
-                                    <a href="payment2.php?ID=<?php echo htmlspecialchars($row['accountID']); ?>" class="btn btn-sm btn-primary me-2">INVOICE</a>
+                                    <!-- <a id="openModalBtn" class="btn btn-sm btn-primary me-2">Check SOA Status</a> -->
+                                    <a href="check_soa_status.php?ID=<?php echo htmlspecialchars($row['accountID']); ?>" class="btn btn-sm btn-primary me-2">Check SOA Status</a>
+                                    <a href="javascript-print/invoice.php?ID=<?php echo htmlspecialchars($row['accountID']); ?>" class="btn btn-sm btn-primary me-2">INVOICE</a>
 
-
+                                  
 
                                     </td>
                                 </tr>
@@ -158,6 +219,20 @@ $con->close(); // Ensures all operations are complete
     </div>
 </div>
 
+<!-- Modal Structure -->
+<div id="soaModal" class="modal">
+    <div class="modal-content">
+        <span class="closeX">&times;</span>
+        <h2>SOA Status</h2>
+        <p id="statusText">Status: Processing</p>
+        <div class="status-buttons">
+            <button class="status-btn btn btn-outline-primary" data-status="Processing">Processing</button>
+            <button class="status-btn btn btn-outline-primary" data-status="Ready to Release">Ready to Release</button>
+            <button class="status-btn btn btn-outline-primary" data-status="Claimed">Claimed</button>
+        </div>
+    </div>
+</div>
+
 <script src="javascript/script.js"></script>
 <script src="bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js"></script>
 
@@ -172,6 +247,43 @@ $con->close(); // Ensures all operations are complete
             }, 3000);
         }
     });
+
+
+ // Wait for the DOM to fully load before adding event listeners
+document.addEventListener('DOMContentLoaded', function () {
+    // Get the modal, button references, and elements
+    var modal = document.getElementById("soaModal");
+    var openModalBtn = document.getElementById("openModalBtn");
+    var closeBtn = document.getElementsByClassName("closeX")[0]; // Correcting for multiple close buttons
+    var statusText = document.getElementById("statusText");
+    var statusButtons = document.querySelectorAll(".status-btn");
+
+    // Open the modal when the button is clicked
+    openModalBtn.onclick = function() {
+        modal.style.display = "block";
+    }
+
+    // Close the modal when the "x" button is clicked
+    closeBtn.onclick = function() {
+        modal.style.display = "none";
+    }
+
+    // Close the modal if the user clicks outside the modal content
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+
+    // Update the status when a button is clicked
+    statusButtons.forEach(function(button) {
+        button.addEventListener("click", function() {
+            var newStatus = button.getAttribute("data-status");
+            statusText.innerText = "Status: " + newStatus;  // Update the status text
+        });
+    });
+});
+
 </script>
 </body>
 </html>

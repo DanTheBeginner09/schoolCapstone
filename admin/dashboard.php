@@ -419,8 +419,8 @@ button#cancelLogout:hover {
                                 <th>Email</th>
                                 <th>School Year</th>
                                 <th>Current Balance</th>
-                                <th>Paid Amount</th>
                                 <th>Total Tuition</th>
+                                <th>SOA request</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -438,8 +438,8 @@ button#cancelLogout:hover {
                                     <td><?php echo htmlspecialchars($r['email']); ?></td>
                                     <td><?php echo htmlspecialchars($r['school_year']); ?></td>
                                     <td><?php echo htmlspecialchars($r['remainingbalance']); ?></td>
-                                    <td><?php echo htmlspecialchars($r['paymentAmount']); ?></td>
                                     <td><?php echo htmlspecialchars($r['totalTuition']); ?></td>
+                                    <td>Yes</td>
                                     <td>
                                         <div class="d-flex justify-content-center">
         <a href="view.php?ID=<?php echo htmlspecialchars($r['accountID']); ?>" class="btn btn-sm btn-primary me-2">View Info</a>

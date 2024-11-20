@@ -138,6 +138,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['firstQuarter'])) {
         .receipt-box .row {
             margin-bottom: 10px;
         }
+
+        .btn-custom {
+        background-color: #28a745; /* Green */
+        border-color: #28a745; /* Green border */
+    }
+
+    .btn-custom:hover {
+        background-color: #218838; /* Darker green on hover */
+        border-color: #1e7e34; /* Darker green border on hover */
+    }
     </style>
 </head>
 <body>
@@ -172,7 +182,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['firstQuarter'])) {
                     <div class="col-md-6"><strong>Date of Payment:</strong><br> <?php echo date('F j, Y'); ?></div>
                 </div>
                 <div class="text-center mt-3">
-                    <a href="accounting.php" class="btn btn-secondary">Back to Search</a>
+                <a href="clearance.php?ID=<?php echo htmlspecialchars($student['accountID']); ?>" class="btn btn-primary">CLEARANCE UPDATE</a>
+
                 </div>
             </div>
         <?php elseif ($errorMessage): ?>

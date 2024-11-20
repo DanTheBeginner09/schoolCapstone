@@ -1,102 +1,86 @@
 <?php
-// Start the session and include database connection
 session_start();
 include_once("dbconnection/connect.php");
 $con = connection();
 
-// Check if the accountID is provided in the URL
-if (isset($_GET['ID'])) {
-    $accountID = $_GET['ID'];
-
-    // Retrieve student details based on accountID
-    $sql = "SELECT * FROM students WHERE accountID = ?";
-    $stmt = $con->prepare($sql);
-    $stmt->bind_param("i", $accountID);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $student = $result->fetch_assoc();
-
-    // Check if student data exists
-    if (!$student) {
-        echo "No student found with the provided account ID.";
-        exit;
-    }
-
-    // Initialize success and error messages
-    $successMessage = "";
-    $errorMessage = "";
-
-    // Process form submission
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        $paymentAmount = $_POST['paymentAmount'];
-
-        // Validate payment amount
-        if (is_numeric($paymentAmount) && $paymentAmount > 0) {
-            // Ensure payment does not exceed the current balance
-            if ($paymentAmount > $student['remainingbalance']) {
-                $errorMessage = "Payment amount cannot exceed the current balance of $" . number_format($student['remainingbalance'], 2);
-            } else {
-                // Calculate the new balance
-                $newBalance = $student['remainingbalance'] - $paymentAmount;
-
-                // Ensure the balance doesn't go below 0
-                if ($newBalance < 0) {
-                    $newBalance = 0;
-                }
-
-                // Update the balance and payment amount in the database
-                // Only update if the payment amount is valid and does not exceed the remaining balance
-                $sql_update = "UPDATE students SET remainingbalance = ?, paymentAmount = ? WHERE accountID = ?";
-                $stmt_update = $con->prepare($sql_update);
-                $stmt_update->bind_param("dii", $newBalance, $paymentAmount, $accountID);
-
-                if ($stmt_update->execute()) {
-                    $successMessage = "Payment successfully processed. New balance is $" . number_format($newBalance, 2);
-                    $_SESSION['payment_success'] = true; 
-                } else {
-                    $errorMessage = "Error processing payment. Please try again.";
-                }
-
-                $stmt_update->close();
-            }
-        } else {
-            $errorMessage = "Please enter a valid payment amount.";
-        }
-    }
-
-    $stmt->close();
-} else {
+// Ensure accountID is set in the URL
+if (!isset($_GET['ID'])) {
     echo "No account ID provided.";
     exit;
 }
 
-// Handle updating quarter statuses if necessary
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['firstQuarter'])) {
-    $firstQuarter = $_POST['firstQuarter'];
-    $secondQuarter = $_POST['secondQuarter'];
-    $thirdQuarter = $_POST['thirdQuarter'];
-    $fourthQuarter = $_POST['fourthQuarter'];
+$accountID = $_GET['ID'];
 
-    // Prepare the SQL query to update quarter statuses
-    $sql_update_quarters = "UPDATE students SET 
-        firstQuarter = ?, 
-        secondQuarter = ?, 
-        thirdQuarter = ?, 
-        fourthQuarter = ? 
-        WHERE accountID = ?";
+// Fetch student details based on accountID
+$sql = "SELECT * FROM students WHERE accountID = ?";
+$stmt = $con->prepare($sql);
+$stmt->bind_param("i", $accountID);
+$stmt->execute();
+$result = $stmt->get_result();
+$student = $result->fetch_assoc();
 
-    $stmt_update_quarters = $con->prepare($sql_update_quarters);
-    $stmt_update_quarters->bind_param("ssssi", $firstQuarter, $secondQuarter, $thirdQuarter, $fourthQuarter, $accountID);
-
-    if ($stmt_update_quarters->execute()) {
-        $successMessage = "Quarter statuses successfully updated.";
-    } else {
-        $errorMessage = "Error updating quarter statuses. Please try again.";
-    }
-
-    $stmt_update_quarters->close();
+if (!$student) {
+    echo "No student found with the provided account ID.";
+    exit;
 }
+
+// Initialize messages
+$successMessage = "";
+$errorMessage = "";
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $paymentAmount = $_POST['paymentAmount'];
+
+    // Validate the payment amount
+    if (!is_numeric($paymentAmount) || $paymentAmount <= 0) {
+        $errorMessage = "Please enter a valid payment amount.";
+    } elseif ($paymentAmount > $student['remainingbalance']) {
+        $errorMessage = "Payment amount cannot exceed the current balance of Php " . number_format($student['remainingbalance'], 2);
+    } else {
+        // Calculate the new balance
+        $newBalance = max(0, $student['remainingbalance'] - $paymentAmount);
+
+        // Determine status based on payment amount
+        $status = ($paymentAmount == 3000) ? "Paid" : "Partial";
+
+        // Update the database with the new payment amount and status
+        // Start transaction to ensure consistency
+        $con->begin_transaction();
+
+        try {
+            // SQL query to update the balance and payment status (no quarter logic)
+            $sql_update = "UPDATE students 
+                           SET remainingbalance = ?, paymentAmount = ?, status = ? 
+                           WHERE accountID = ?";
+            $stmt_update = $con->prepare($sql_update);
+            $stmt_update->bind_param("dssi", $newBalance, $paymentAmount, $status, $accountID);
+            $stmt_update->execute();
+
+            // Check if the update was successful
+            if ($stmt_update->affected_rows > 0) {
+                $successMessage = "Payment successfully processed. New balance is Php " . number_format($newBalance, 2);
+            } else {
+                $errorMessage = "No changes were made to the database.";
+            }
+
+            // Commit the transaction
+            $con->commit();
+        } catch (Exception $e) {
+            // Rollback in case of error
+            $con->rollback();
+            $errorMessage = "Error processing payment: " . $e->getMessage();
+        }
+
+        $stmt_update->close();
+    }
+}
+
+$stmt->close();
+$con->close();
 ?>
+
+<!-- The rest of the HTML content remains unchanged -->
+
 
 
 <!DOCTYPE html>
@@ -121,6 +105,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['firstQuarter'])) {
             width: 80%;
             margin: 15px auto;
         }
+
+        select {
+            width: 200px;
+            padding: 8px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+      
     </style>
 
 </head>
@@ -142,16 +136,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['firstQuarter'])) {
         <?php endif; ?>
 
         <form method="POST" action="receipt.php?ID=<?php echo htmlspecialchars($accountID); ?>">
-       
-        
-            <div class="form-group mt-3">
+        <div class="form-group mt-3">
                 <label for="studentID">Student ID</label>
                 <input type="text" id="studentID" class="form-control" value="<?php echo htmlspecialchars($student['studentID']); ?>" disabled>
             </div>
+        
+          
             <div class="form-group mt-3">
                 <label for="currentBalance">Current Balance</label>
                 <input type="text" id="currentBalance" class="form-control" value="Php <?php echo number_format($student['remainingbalance'], 2); ?>" disabled>
             </div>
+
 
             <div class="form-group mt-3">
     <label for="paymentAmount">Amount Paid</label>
