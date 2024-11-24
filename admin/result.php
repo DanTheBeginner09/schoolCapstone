@@ -221,68 +221,17 @@ $con->close(); // Ensures all operations are complete
         </div>
     </header>
 
-    <main>
-       <!-- Burger Menu -->
-<input type="checkbox" class="toggle-Sidebar" id="toggle-Sidebar">
-<label for="toggle-Sidebar" class="toggle-icon">
-    <div class="bar-top"></div>
-    <div class="bar-center"></div>
-    <div class="bar-bottom"></div>
-</label>
+  
+ 
+  
+    <!-- Student Records Table -->
+    <div class="container table-container" style="margin-top: 70px; background-color: rgba(255, 255, 255, 0.8); padding: 20px; border-radius: 20px; width: 100%;">
 
-<!-- Sidebar -->
-  <!-- Sidebar -->
-  <div class="sidebar">
-            <ul class="menu">
-                <div class="profile">
-                    <a href="#"><img src="img/school-logo.png" alt="school logo"></a>  
-                    <a href="#" id="dashboardLink"><h3>ADMIN DASHBOARD</h3></a>
-                </div>
-
-                <!-- Menu links -->
-                <li><a href="add.php">Add Student</a></li>
-                <li><a href="studentInfo.php" >Student Info</a></li>
-                <li><a href="accounting.php" >Accounting</a></li>
-                <li><a href="#">Logout</a></li>
-            </ul>
-        </div>
-
-
-
-        <!-- Dashboard Section -->
-        <div class="dashboard" class="container">
-            <!-- Summary Section -->
-            <div class="dashboard-header text-left mb-4">
-                <h3>Summary</h3>
-            </div>
-            <div class="dashboard-content d-flex justify-content-around flex-wrap  custom-margin">
-                <div class="stat-card">
-                    <img src="img/students.png" alt="student" class="stat-icon">
-                    <h5>Total Students</h5>
-                    <p><?php echo  $total_students ?></p>
-                </div>
-                <div class="stat-card">
-                    <img src="img/earnings.png" alt="earnings" class="stat-icon">
-                    <h5>Total Amount Collected</h5>
-                    <p>₱0</p>
-                </div>
-                <div class="stat-card">
-                    <img src="img/validating-ticket.png" alt="paid" class="stat-icon">
-                    <h5>Paid</h5>
-                    <p>₱0</p>
-                </div>
-                <div class="stat-card">
-                    <img src="img/bill.png" alt="bill" class="stat-icon">
-                    <h5>Unpaid</h5>
-                    <p>₱10</p>
-                </div>
-            </div>
-
-            <!-- Student Records Table -->
-            <div class="table-container" class="container">
-                <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap">
+    
+    <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap">
                     <h3 class="mb-1">Student Records</h3>
-                </div>
+
+      </div>
 
        <!-- Search bar -->
 <form method="GET" action="">
@@ -297,14 +246,19 @@ $con->close(); // Ensures all operations are complete
     <table class="table table-striped table-bordered table-hover table-sm text-center align-middle">
         <thead class="table-dark">
             <tr>
-                <th>Student ID</th>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Gender</th>
-                <th>Age</th>
-                <th>Grade</th>
-                <th>Email</th>
-                <th>Action</th>
+            <th>Student ID</th>
+                                <th>First Name</th>
+                                <th>Last Name</th>
+                                <th>Gender</th>
+                                <th>Age</th>
+                                <th>Grade</th>
+                                <th>Section</th> 
+                                <th>Email</th>
+                                <th>School Year</th>
+                                <th>Current Balance</th>
+                                <th>Payment</th>
+                                <th>Total Tuition</th>
+                                <th>Action</th>
             </tr>
         </thead>
         <tbody>
@@ -314,16 +268,22 @@ $con->close(); // Ensures all operations are complete
                 while ($r = $fetch->fetch_assoc()) {
                     ?>
                     <tr>
-                        <td><?php echo htmlspecialchars($r['studentID']); ?></td>
-                        <td><?php echo htmlspecialchars($r['fname']); ?></td>
-                        <td><?php echo htmlspecialchars($r['lname']); ?></td>
-                        <td><?php echo htmlspecialchars($r['gender']); ?></td>
-                        <td><?php echo htmlspecialchars($r['age']); ?></td>
-                        <td><?php echo htmlspecialchars($r['grade']); ?></td>
-                        <td><?php echo htmlspecialchars($r['email']); ?></td>
+                    <td><?php echo htmlspecialchars($r['studentID']); ?></td>
+                                    <td><?php echo htmlspecialchars($r['fname']); ?></td>
+                                    <td><?php echo htmlspecialchars($r['lname']); ?></td>
+                                    <td><?php echo htmlspecialchars($r['gender']); ?></td>
+                                    <td><?php echo htmlspecialchars($r['age']); ?></td>
+                                    <td><?php echo htmlspecialchars($r['grade']); ?></td>   
+                                    <td><?php echo htmlspecialchars($r['section']); ?></td> 
+                                    <td><?php echo htmlspecialchars($r['email']); ?></td>
+                                    <td><?php echo htmlspecialchars($r['school_year']); ?></td>
+                                    <td><?php echo htmlspecialchars($r['remainingbalance']); ?></td>
+                                    <td><?php echo htmlspecialchars($r['paymentAmount']); ?></td>
+                                    <td><?php echo htmlspecialchars($r['totalTuition']); ?></td>
                         <td>
                             <div class="d-flex justify-content-center">
-                                <a href="view.php" class="btn btn-sm btn-primary me-2">View</a>
+                            <a href="view.php?ID=<?php echo htmlspecialchars($r['accountID']); ?>" class="btn btn-sm btn-primary me-2">View Info</a>
+                                <a href="update.php?ID=<?php echo htmlspecialchars($r['accountID']); ?>" class="btn btn-sm btn-secondary me-2">Update</a>
                             </div>
                         </td>
                     </tr>
@@ -367,18 +327,17 @@ $con->close(); // Ensures all operations are complete
     </div>
 
 
+    <div style="text-align: center; margin-top: 20px;">
+    <a href="dashboard.php" class="btn btn-light btn-sm">
+        <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </a>
+</div>
+
+
 </div> 
 
 
-     <!-- Footer -->
-     <footer>
-        <div class="footer-content">
-            <p>&copy; Gabila & Canaway 2024 Capstone. All rights reserved.</p>
-        </div>
-    </footer>
-        </div>
-<script src="javascript/script.js"></script>
-</main>              
+     
 
 </body>
 

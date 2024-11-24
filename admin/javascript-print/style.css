@@ -1,0 +1,219 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+
+}
+#save_to_image {
+  width: 100%;
+  max-width: 800px;
+  height: auto;
+  text-decoration: none;
+}
+
+.invoice-container {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 30px;
+  border: 1px solid #eee;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+  font-size: 16px;
+  line-height: 24px;
+  font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+  color: #555;
+}
+
+.invoice-container table {
+  width: 100%;
+  line-height: inherit;
+  text-align: left;
+}
+
+.invoice-container table td {
+  padding: 5px;
+  vertical-align: top;
+}
+
+.invoice-container table tr td:nth-child(2) {
+  text-align: right;
+}
+
+.invoice-container table tr.top table td {
+  padding-bottom: 20px;
+}
+
+.invoice-container table tr.top table td.title {
+  font-size: 45px;
+  line-height: 45px;
+  color: #333;
+}
+
+.invoice-container table tr.information table td {
+  padding-bottom: 40px;
+}
+
+.invoice-container table tr.heading td {
+  background: #eee;
+  border-bottom: 1px solid #ddd;
+  font-weight: bold;
+}
+
+.invoice-container table tr.details td {
+  padding-bottom: 20px;
+}
+
+.invoice-container table tr.item td {
+  border-bottom: 1px solid #eee;
+}
+
+.invoice-container table tr.item.last td {
+  border-bottom: none;
+}
+
+.invoice-container table tr.total td:nth-child(2) {
+  border-top: 2px solid #eee;
+  font-weight: bold;
+}
+
+.buttons-container {
+  width: 100%;
+  max-width: 800px;
+  height: 80px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.buttons-container button {
+  margin: 5px;
+  border: none;
+  outline: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  color: #fff;
+  transition: all 0.5s ease-in;
+}
+
+#save {
+  background-color: green;
+}
+
+#print {
+  background-color: blue;
+}
+
+#print:hover,
+#save:hover {
+  background-color: #333;
+}
+
+/* css for print */
+@media print {
+  .invoice-container {
+    max-width: unset;
+    box-shadow: none;
+    border: 0px;
+    background-color: white;
+    height: 100%;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    margin: 0;
+    padding: 15px;
+    font-size: 14px;
+    line-height: 18px;
+  }
+}
+
+@media only screen and(max-width: 600px) {
+  .invoice-container table tr.top table td {
+    width: 100%;
+    display: block;
+    text-align: center;
+  }
+  .invoice-container table tr.information table td {
+    width: 100%;
+    display: block;
+    text-align: center;
+  }
+}
+
+/* RTL */
+.invoice-container.rtl {
+  direction: rtl;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.invoice-container.rtl table {
+  text-align: right;
+}
+
+.invoice-container.rtl table tr td:nth-child(2) {
+  text-align: left;
+}
+
+/* CSS for print */
+@media print {
+  .invoice-container {
+    max-width: unset;
+    box-shadow: none;
+    border: 0px;
+    background-color: white;
+    height: 100%;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    margin: 0;
+    padding: 15px;
+    font-size: 14px;
+    line-height: 18px;
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  .invoice-container table tr.top table td {
+    width: 100%;
+    display: block;
+    text-align: center;
+  }
+  .invoice-container table tr.information table td {
+    width: 100%;
+    display: block;
+    text-align: center;
+  }
+
+  .buttons-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .buttons-container button {
+    width: 100%; /* Full width buttons on mobile */
+    margin: 5px 0; /* Adjusted margin */
+  }
+}
+
+/* RTL */
+.invoice-container.rtl {
+  direction: rtl;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.invoice-container.rtl table {
+  text-align: right;
+}
+
+.invoice-container.rtl table tr td:nth-child(2) {
+  text-align: left;
+}

@@ -217,23 +217,26 @@ body {
 
 
 /* mao ni ang code mag pa gawas sa sidebar */
-input[type="checkbox"]:checked ~ .sidebar{
-    transform: translateX(0);
+/* When the checkbox is checked, show the sidebar */
+input[type="checkbox"]:checked ~ .sidebar {
+    transform: translateX(0); /* Sidebar appears */
 }
 
-input[type="checkbox"]:checked ~ .toggle-icon > .bar-top{
-    transform: rotate(135deg);
-    margin-top: 8px;
+/* When the checkbox is checked, keep the hamburger icon in its initial state */
+input[type="checkbox"]:checked ~ .toggle-icon > .bar-top {
+    transform: rotate(0deg); /* No rotation */
+    margin-top: 0; /* Reset margin */
 }
 
-input[type="checkbox"]:checked ~ .toggle-icon > .bar-center{
-    opacity: 0;
+input[type="checkbox"]:checked ~ .toggle-icon > .bar-center {
+    opacity: 1; /* Keep the center bar visible */
 }
 
-input[type="checkbox"]:checked ~ .toggle-icon > .bar-bottom{
-    transform: rotate(-135deg);
-    margin-top: -12px;
+input[type="checkbox"]:checked ~ .toggle-icon > .bar-bottom {
+    transform: rotate(0deg); /* No rotation */
+    margin-top: 0; /* Reset margin */
 }
+
 
 li img{
     height: 120px;
@@ -380,10 +383,12 @@ padding: 10px;
         
         
                 .container {
+
                     width: 100%;
                     max-width: 500px;
-                    padding: 40px;
+                    padding: 30px;
                     margin: 10px;
+                    margin-top: 10px;
                     background: #ffffff;
                     border-radius: 10px;
                     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -394,6 +399,7 @@ padding: 10px;
                     font-size: 24px;
                     color: #333;
                     margin-bottom: 20px;
+                    margin-top: -10px;
                 }
         
                /* Form styles */
@@ -579,7 +585,7 @@ padding: 10px;
     
 .transaction {
     width: 80%; /* Makes it responsive */
-    height: 70%;
+    height: 40%;
     max-width: 600px; /* Limits max width */
     padding: 30px;
     margin: 50px auto; /* Centers horizontally */
@@ -635,106 +641,6 @@ padding: 10px;
 
 
 
-.transaction {
-    margin-top: 20px;
-    padding: 15px;
-    background-color: #f9f9f9; /* Light background color */
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add shadow for depth */
-    width: 100%; /* Make sure it takes the full width */
-    box-sizing: border-box;
-}
-
-/* Style for the table inside the transaction div */
-.transaction table {
-    width: 100%;
-    border-collapse: collapse; /* Collapse table borders */
-    margin-top: 20px;
-}
-
-.transaction th, .transaction td {
-    padding: 12px; /* Add padding to table cells */
-    text-align: left; /* Align text to the left */
-    border: 1px solid #ddd; /* Light border color */
-}
-
-/* Style for table headers */
-.transaction th {
-    background-color: #f2f2f2;
-    font-weight: bold;
-    color: #333;
-}
-
-/* Style for odd and even rows */
-.transaction tr:nth-child(odd) {
-    background-color: #f9f9f9;
-}
-
-.transaction tr:nth-child(even) {
-    background-color: #f1f1f1;
-}
-
-/* Style for cells with specific remarks (like cleared, partial) */
-.transaction td {
-    font-size: 1rem;
-    color: #555;
-}
-
-/* Optional hover effect on rows */
-.transaction tr:hover {
-    background-color: #f0f0f0;
-    cursor: pointer;
-}
-
-.close-btn {
-    position: absolute;
-    top: 30px;
-    right: 30px;
-    font-size: 20px;
-    font-weight: bold; /* Makes the text bold */
-    background-color: transparent;
-    border: none;
-    color: #808080; /* Gray color for the text */
-    cursor: pointer;
-    transition: all 0.3s ease; /* Smooth transition effect */
-}
-
-/* Optional: Change appearance on hover */
-.close-btn:hover {
-    color: #ff0000;  /* Change color to red when hovered */
-    transform: scale(1.1);  /* Slightly enlarge the button */
-}
-
-
- /* Container for the table */
- .transaction {
-            position: relative;
-          
-        }
-
-      
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .transaction table {
-        font-size: 0.9rem; /* Reduce font size for smaller screens */
-    }
-
-    .transaction th, .transaction td {
-        padding: 8px; /* Reduce padding on smaller screens */
-    }
-}
-
-@media (max-width: 576px) {
-    .transaction table {
-        font-size: 0.8rem; /* Further reduce font size for very small screens */
-    }
-
-    .transaction th, .transaction td {
-        padding: 6px; /* Even more padding reduction */
-    }
-}
-
 /* Media Queries */
 @media (max-width: 768px) {
     .mainheader p {
@@ -775,6 +681,4 @@ padding: 10px;
     .subheading {
         font-size: 1rem;
     }
-
-
 }
