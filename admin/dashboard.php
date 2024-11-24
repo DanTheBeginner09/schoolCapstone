@@ -393,13 +393,13 @@ button#cancelLogout:hover {
             <!-- Student Records Table -->
             <div class="table-container" class="container">
                 <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap">
-                    <h3 class="mb-1">Student Records</h3>
+                    <h2 class="mb-1">Student Records</h2>
                 </div>
                 <!-- Search bar -->
 
-                <form action="result.php" method="GET" class="mb-4 d-flex" style="max-width: 300px;">
-    <input name="search" type="search" placeholder="Search by ID..." class="form-control me-2" style="padding: 15px;">
-    <button type="submit" class="btn btn-primary" style="height: 40px; padding: 0 20px;">Search </button>
+                <form action="result.php" method="GET" class="mb-4 d-flex" style="max-width: 500px;">
+    <input name="search" type="search" placeholder="Search by ID..." class="form-control me-2" style="padding: 30px;">
+    <button type="submit" class="btn btn-primary" style="height: 60px; padding: 0 20px;">Search </button>
         </form>
 
 
@@ -420,7 +420,8 @@ button#cancelLogout:hover {
                                 <th>School Year</th>
                                 <th>Current Balance</th>
                                 <th>Total Tuition</th>
-                                <th>SOA request</th>
+                                <th>SOA Request</th>
+                                <th>SOA Status</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -439,7 +440,8 @@ button#cancelLogout:hover {
                                     <td><?php echo htmlspecialchars($r['school_year']); ?></td>
                                     <td><?php echo htmlspecialchars($r['remainingbalance']); ?></td>
                                     <td><?php echo htmlspecialchars($r['totalTuition']); ?></td>
-                                    <td>Yes</td>
+                                    <td><?php echo htmlspecialchars($r['student_request']); ?></td>
+                                    <td><?php echo htmlspecialchars($r['soa']); ?></td>
                                     <td>
                                         <div class="d-flex justify-content-center">
         <a href="view.php?ID=<?php echo htmlspecialchars($r['accountID']); ?>" class="btn btn-sm btn-primary me-2">View Info</a>
@@ -498,7 +500,7 @@ button#cancelLogout:hover {
    <!-- Footer -->
     <!-- Footer -->
  <footer class="footer bg-dark text-light text-center py-2">
-        <p>&copy; Carlgeline Gabilla & Jessa Mae Canaway Capstone Project  2024. All rights reserved.</p>
+        <p>&copy; Carlgeline Gabilla & Jessabel Canaway Capstone Project  2024. All rights reserved.</p>
     </footer>
 
     

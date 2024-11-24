@@ -78,6 +78,56 @@ $con->close();
 }
 
 
+.close-btn {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    font-size: 20px;
+    font-weight: bold; /* Makes the text bold */
+    background-color: transparent;
+    border: none;
+    color: #808080; /* Gray color for the text */
+    cursor: pointer;
+    transition: all 0.3s ease; /* Smooth transition effect */
+}
+
+/* Optional: Change appearance on hover */
+.close-btn:hover {
+    color: #ff0000;  /* Change color to red when hovered */
+    transform: scale(1.1);  /* Slightly enlarge the button */
+}
+
+
+ /* Container for the table */
+ .transaction {
+            position: relative;
+          
+        }
+
+
+/* Style for success message */
+.success-message {
+    color: green;  /* Makes the text green */
+    font-weight: bold; /* Optional: makes the text bold */
+    background-color: #d4edda;  /* Optional: light green background for success message */
+    padding: 10px;  /* Optional: add padding around the message */
+    border: 1px solid #c3e6cb;  /* Optional: a border with a light green color */
+    border-radius: 5px;  /* Optional: rounded corners */
+    margin: 10px 0;  /* Optional: add margin for spacing */
+}
+
+/* Style for success message */
+.error-message {
+    color: red;  /* Makes the text green */
+    font-weight: bold; /* Optional: makes the text bold */
+    background-color: #d4edda;  /* Optional: light green background for success message */
+    padding: 10px;  /* Optional: add padding around the message */
+    border: 1px solid #c3e6cb;  /* Optional: a border with a light green color */
+    border-radius: 5px;  /* Optional: rounded corners */
+    margin: 10px 0;  /* Optional: add margin for spacing */
+}
+
+
 
 /* Optional media query for smaller screens */
 @media (max-width: 576px) {
@@ -92,6 +142,14 @@ $con->close();
     .transaction{
         height: 70%;
     }
+}
+
+.success-message, .error-message {
+    transition: opacity 1s ease-out;
+}
+
+.success-message[style="display: none;"], .error-message[style="display: none;"] {
+    opacity: 0;
 }
 
 
@@ -144,25 +202,48 @@ $con->close();
 
     <div class="paymentdashboard">
     
-    <p>INVOICE</p>
+    <p>TRANSACTION </p>
     </div>
 
 
-<!-- 
+
 <div class="transaction">
-  <div class="transaction-item">
-    <img src="img/file 1.png" alt="Payment per exam">
-    <a href="#"><p>Payment per exam</p></a>
-  </div>
-  <div class="transaction-item">
-    <a href="javascript-print/index.php"><img src="img/file 1.png" alt="Invoice"></a>
-    <a href="javascript-print/index.php">Invoice</a>
-  </div>
-  <div class="transaction-item">
-    <img src="img/file 1.png" alt="Remaining balance">
-    <a href="#"><p>Remaining balance</p></a>
-  </div>
-</div> -->
+    
+
+<div class="transaction-item">
+        <!-- Close Button -->
+        <button class="close-btn" onclick="closeTable()">X</button>
+
+    <img src="img/reminders.png" alt="notify">
+    
+    <!-- Form to handle the request for Statement of Account -->
+    <form action="soa_clicked.php" method="POST">
+        <p>Click to Request for Statement of Account <br>
+        It will notify the school admin to provide the statement of account</p>
+        
+        <!-- Button to trigger the request -->
+        <button type="submit" name="request_soa" value="yes">Request</button>
+
+        <!-- Hidden field to pass the studentID -->
+        <input type="hidden" name="studentID" value="<?php echo $student['studentID']; ?>">
+    </form>
+</div>
+
+<?php if (isset($_SESSION['successMessage'])): ?>
+    <div class="success-message" id="successMessage">
+        <?php echo $_SESSION['successMessage']; ?>
+        <?php unset($_SESSION['successMessage']); ?>
+    </div>
+<?php endif; ?>
+
+<?php if (isset($_SESSION['errorMessage'])): ?>
+    <div class="error-message" id="errorMessage">
+        <?php echo $_SESSION['errorMessage']; ?>
+        <?php unset($_SESSION['errorMessage']); ?>
+    </div>
+<?php endif; ?>
+
+</div> 
 
 
 </div>
@@ -187,4 +268,35 @@ $con->close();
 
 </body>
 <script src="javascript/script.js"></script>
+<script>
+// JavaScript to hide the message after 5 seconds
+document.addEventListener("DOMContentLoaded", function() {
+    // Check if success message exists and set the timeout to hide it
+    const successMessage = document.getElementById('successMessage');
+    if (successMessage) {
+        setTimeout(function() {
+            successMessage.style.display = 'none';  // Hide the success message
+        }, 5000);  // 5000ms = 5 seconds
+    }
+
+    // Check if error message exists and set the timeout to hide it
+    const errorMessage = document.getElementById('errorMessage');
+    if (errorMessage) {
+        setTimeout(function() {
+            errorMessage.style.display = 'none';  // Hide the error message
+        }, 5000);  // 5000ms = 5 seconds
+    }
+});
+
+
+    function closeTable() {
+    // Hide the transaction table
+    document.querySelector('.transaction').style.display = 'none';
+    
+    // Redirect to the dashboard page
+    window.location.href = 'dashboard.php';
+}
+    
+
+</script>
 </html>

@@ -189,6 +189,7 @@ $con->close(); // Ensures all operations are complete
                                     <!-- <a id="openModalBtn" class="btn btn-sm btn-primary me-2">Check SOA Status</a> -->
                                     <a href="check_soa_status.php?ID=<?php echo htmlspecialchars($row['accountID']); ?>" class="btn btn-sm btn-primary me-2">Check SOA Status</a>
                                     <a href="javascript-print/invoice.php?ID=<?php echo htmlspecialchars($row['accountID']); ?>" class="btn btn-sm btn-primary me-2">INVOICE</a>
+                                    <a href="#" class="btn btn-sm btn-primary me-2">Email Billing Notify</a>
 
                                   
 
@@ -207,7 +208,7 @@ $con->close(); // Ensures all operations are complete
 
 <!-- Footer -->
 <footer class="footer bg-dark text-light text-center py-2 mt-5">
-    <p>&copy; Carlgeline Gabilla & Jessa Mae Canaway Capstone Project 2024. All rights reserved.</p>
+    <p>&copy; Carlgeline Gabilla & Jessabel Canaway Capstone Project 2024. All rights reserved.</p>
 </footer>
 
 <!-- Logout Modal -->

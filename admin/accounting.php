@@ -434,7 +434,7 @@ $con->close(); // Ensures all operations are complete
 
 <!-- Footer -->
 <footer class="footer bg-dark text-light text-center py-2 mt-5">
-        <p>&copy; Carlgeline Gabilla & Jessa Mae Canaway Capstone Project  2024. All rights reserved.</p>
+        <p>&copy; Carlgeline Gabilla & Jessabel Canaway Capstone Project  2024. All rights reserved.</p>
     </footer>
 
 

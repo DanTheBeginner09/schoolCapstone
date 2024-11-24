@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>School Fees Management System</title>
     <link rel="stylesheet" href="style.css" />
+    
   </head>
   <body>
     <div class="buttons-container">
@@ -55,24 +56,17 @@
           <td>Remarks</td>
         </tr>
         <tr class="item">
-          <td>Registration:</td>
-          <td>500</td>
-        </tr>
-        <tr class="item last">
-          <td>Miscellaneous:</td>
+          <td>First Quarter:</td>
           <td>2000</td>
         </tr>
         <tr class="item last">
-          <td>Downpayment:</td>
-          <td>2000</td>
+          <td>Partial:</td>
+          <td>0</td>
         </tr>
-        <tr class="item last">
-          <td>Tuition:</td>
-          <td>2000</td>
-        </tr>
+     
         <tr class="total">
           <td></td>
-          <td>Total : P385.00</td>
+          <td>Total : Php 2000.00</td>
         </tr>
       </table>
     </div>

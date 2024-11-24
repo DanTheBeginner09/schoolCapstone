@@ -96,6 +96,34 @@ tr:nth-child(even) {
 
 
 
+.close-btn {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    font-size: 20px;
+    font-weight: bold; /* Makes the text bold */
+    background-color: transparent;
+    border: none;
+    color: #808080; /* Gray color for the text */
+    cursor: pointer;
+    transition: all 0.3s ease; /* Smooth transition effect */
+}
+
+/* Optional: Change appearance on hover */
+.close-btn:hover {
+    color: #ff0000;  /* Change color to red when hovered */
+    transform: scale(1.1);  /* Slightly enlarge the button */
+}
+
+
+ /* Container for the table */
+ .transaction {
+            position: relative;
+          
+        }
+
+
+
 /* Optional media query for smaller screens */
 @media (max-width: 576px) {
     .studentdashboard {
@@ -160,54 +188,25 @@ tr:nth-child(even) {
     <p>PAYMENT RECORDS</p>
     </div>
 
-    <!-- <div class="transaction">
-        
+    
+    <div class="transaction d-flex flex-wrap justify-content-center">
+          <!-- Close Button -->
+      <button class="close-btn" onclick="closeTable()">X</button>
 
-<table>
-  <tr>
-    <th>GRADING</th>
-    <th>AMOUNT PER EXAM</th>
-    <th>REMARKS</th>
-  </tr>
-  <tr>
-    <td>1st GRADING</td>
-    <td>php 2,500.00</td>
-    <td>cleared</td>
-  </tr>
-  <tr>
-    <td>2nd GRADING</td>
-    <td>php 2,500.00</td>
-    <td>cleared</td>
-  </tr>
-  <tr>
-    <td>3rd GRADING</td>
-    <td>php 1,500.00</td>
-    <td>partial</td>
-  </tr>
-  <tr>
-    <td>4th GRADING</td>
-    <td>php 1,500.00</td>
-    <td>partial</td>
-  </tr>
-</table>
-</div> -->
-
-
-
-<div class="transaction">
-  <div class="transaction-item">
-    <img src="img/file 1.png" alt="Payment per exam">
-    <a href="#"><p>Payment per exam</p></a>
+  <div class="transaction-item d-flex flex-column align-items-center col-12 col-sm-4 col-md-3">
+    <a href="paymentperexam.php"><img src="img/file 1.png" alt="Payment per exam" class="img-fluid"></a>
+    <a href="paymentperexam.php"><p>Payment per exam</p></a>
   </div>
-  <div class="transaction-item">
-    <a href="javascript-print/index.php"><img src="img/file 1.png" alt="Invoice"></a>
-    <a href="javascript-print/index.php">Invoice</a>
+  <div class="transaction-item d-flex flex-column align-items-center col-12 col-sm-4 col-md-3">
+    <a href="javascript-print/invoice.php?ID=<?php echo htmlspecialchars($student['accountID']); ?>"><img src="img/file 1.png" alt="Invoice" class="img-fluid"></a>
+    <a href="javascript-print/invoice.php?ID=<?php echo htmlspecialchars($student['accountID']); ?>">Invoice</a>
   </div>
-  <div class="transaction-item">
-    <img src="img/file 1.png" alt="Remaining balance">
-    <a href="#"><p>Remaining balance</p></a>
+  <div class="transaction-item d-flex flex-column align-items-center col-12 col-sm-4 col-md-3">
+    <a href="remainingbalance.php"><img src="img/file 1.png" alt="Remaining balance" class="img-fluid"></a>
+    <a href="remainingbalance.php"><p>Remaining balance</p></a>
   </div>
 </div>
+
 
 
 </div>
@@ -232,4 +231,15 @@ tr:nth-child(even) {
 
 </body>
 <script src="javascript/script.js"></script>
+
+
+<script>
+    function closeTable() {
+    // Hide the transaction table
+    document.querySelector('.transaction').style.display = 'none';
+    
+    // Redirect to the dashboard page
+    window.location.href = 'dashboard.php';
+}
+    </script>
 </html>

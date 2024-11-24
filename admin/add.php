@@ -9,7 +9,7 @@ $successMessage = "";
 // Function to check if email already exists
 function checkEmailExists($email, $con) {
     $stmt = $con->prepare("SELECT COUNT(*) FROM students WHERE email = ?");
-    if ($stmt === false) {
+    if (!$stmt) {
         die('Prepare failed: ' . $con->error);
     }
     $stmt->bind_param("s", $email);
@@ -20,61 +20,72 @@ function checkEmailExists($email, $con) {
     return $count > 0;
 }
 
+// Function to generate new studentID
+function generateStudentID($con) {
+    $currentYear = date("Y");
+    $likePattern = $currentYear . '-%';
+
+    $stmt = $con->prepare("SELECT MAX(studentID) as last_id FROM students WHERE studentID LIKE ?");
+    if (!$stmt) {
+        die('Prepare failed: ' . $con->error);
+    }
+    $stmt->bind_param("s", $likePattern);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    $stmt->close();
+
+    $lastID = isset($row['last_id']) ? $row['last_id'] : '';
+    $nextID = 1;
+
+    if ($lastID) {
+        $parts = explode('-', $lastID);
+        if (count($parts) == 2 && $parts[0] == $currentYear) {
+            $nextID = intval($parts[1]) + 1;
+        }
+    }
+
+    return $currentYear . '-' . str_pad($nextID, 4, '0', STR_PAD_LEFT);
+}
+
+// Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add-student'])) {
-    // Sanitize input values
-    $fname = $con->real_escape_string($_POST['fname']);
-    $lname = $con->real_escape_string($_POST['lname']);
-    $gender = $con->real_escape_string($_POST['gender']);
-    $age = (int)$_POST['age'];
-    $studentEmail = $con->real_escape_string($_POST['studentEmail']);
-    $schoolYear = $con->real_escape_string($_POST['schoolYear']);
-    $grade = (int)$con->real_escape_string($_POST['grade']);  // Ensure grade is an integer
-    $section = $con->real_escape_string($_POST['section']);
+    // Sanitize and validate input values
+    $fname = $con->real_escape_string(trim($_POST['fname']));
+    $lname = $con->real_escape_string(trim($_POST['lname']));
+    $gender = $con->real_escape_string(trim($_POST['gender']));
+    $age = filter_var($_POST['age'], FILTER_VALIDATE_INT);
+    $studentEmail = filter_var($con->real_escape_string($_POST['studentEmail']), FILTER_SANITIZE_EMAIL);
+    $schoolYear = $con->real_escape_string(trim($_POST['schoolYear']));
+    $grade = filter_var($con->real_escape_string($_POST['grade']), FILTER_VALIDATE_INT);
+    $section = $con->real_escape_string(trim($_POST['section']));
     $date = date("Y-m-d");
 
-    // Check if email already exists
-    if (checkEmailExists($studentEmail, $con)) {
+    // Input validation
+    if (!$age || $age < 1 || $age > 120) {
+        $errorMessage = "Invalid age provided.";
+    } elseif (!filter_var($studentEmail, FILTER_VALIDATE_EMAIL)) {
+        $errorMessage = "Invalid email format.";
+    } elseif (checkEmailExists($studentEmail, $con)) {
         $errorMessage = "Email already in use. Please enter another email.";
     } else {
-        // Generate studentID based on the current year and the last ID used
-        $currentYear = date("Y");
-        $stmt = $con->prepare("SELECT MAX(studentID) as last_id FROM students WHERE studentID LIKE ?");
-        if ($stmt === false) {
-            die('Prepare failed: ' . $con->error);
-        }
-        $likePattern = $currentYear . '-%';
-        $stmt->bind_param("s", $likePattern);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $row = $result->fetch_assoc();
+        // Generate studentID
+        $studentID = generateStudentID($con);
 
-        $lastID = isset($row['last_id']) ? $row['last_id'] : '';
-        $nextID = 1;
-
-        if ($lastID) {
-            $parts = explode('-', $lastID);
-            if (count($parts) == 2 && $parts[0] == $currentYear) {
-                $nextID = intval($parts[1]) + 1;
-            }
-        }
-
-        $studentID = $currentYear . '-' . str_pad($nextID, 4, '0', STR_PAD_LEFT);
-
-        // Prepare and execute the insert query for student data
+        // Insert student data
         $stmt = $con->prepare("INSERT INTO students (fname, lname, gender, age, studentID, email, school_year, grade, section, date, totalTuition, remainingBalance, paymentAmount, status) 
                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        if ($stmt === false) {
+        if (!$stmt) {
             die('Prepare failed: ' . $con->error);
         }
 
-        // Set default values for tuition and payments
         $totalTuition = 12000;
         $remainingBalance = 12000;
         $paymentAmount = 0;
         $status = 'Active';
 
-        // Bind parameters for the student insert query
-        $stmt->bind_param("sssiissssdddds", 
+        $stmt->bind_param(
+            "sssiissssdddds", 
             $fname, 
             $lname, 
             $gender, 
@@ -91,34 +102,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add-student'])) {
             $status
         );
 
-        // Execute and check for successful insertion
         if ($stmt->execute()) {
             $successMessage = "Student successfully added.";
-
-            // Insert default values into the payment table
-            $accountID = $studentID;  // Using studentID as accountID
-            $stmt = $con->prepare("INSERT INTO payment (accountID, status_1st_quarter, status_2nd_quarter, status_3rd_quarter, status_4th_quarter, registration, miscellaneous, tuition, quarter, downpayment, lab_rle, per_exam, total) 
-                                   VALUES (?, 'Unpaid', 'Unpaid', 'Unpaid', 'Unpaid', 0, 0, 12000, 1, 0, 0, 0, 12000)");
-            if ($stmt === false) {
-                die('Prepare failed: ' . $con->error);
-            }
-
-            $stmt->bind_param("s", $accountID);
-            if ($stmt->execute()) {
-                $successMessage .= " Payment details initialized.";
-            } else {
-                $errorMessage = "Failed to initialize payment details.";
-            }
         } else {
             $errorMessage = "Failed to add student. Please try again.";
         }
-
+        
+        // Close the prepared statement
         $stmt->close();
     }
 }
 
 $con->close();
-?>
+?>  
+
+
 
 
 <!DOCTYPE html>
@@ -208,6 +206,10 @@ $con->close();
                             <option value="1">Grade 1</option>
                             <option value="2">Grade 2</option>
                             <option value="3">Grade 3</option>
+                            <option value="4">Grade 4</option>
+                            <option value="5">Grade 5</option>
+                            <option value="6">Grade 6</option>
+                           
                             <!-- Add other grades as needed -->
                         </select>
                     </div>
@@ -250,7 +252,7 @@ $con->close();
 
 <!-- Footer -->
 <footer class="footer bg-dark text-light text-center py-2 mt-5">
-        <p>&copy; Carlgeline Gabilla & Jessa Mae Canaway Capstone Project  2024. All rights reserved.</p>
+        <p>&copy; Carlgeline Gabilla & Jessabel Canaway Capstone Project  2024. All rights reserved.</p>
     </footer>
 
 

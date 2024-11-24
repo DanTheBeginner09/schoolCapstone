@@ -225,6 +225,12 @@ input[type="checkbox"]:checked ~ .toggle-icon > .bar-bottom {
     margin-top: 0; /* Reset margin */
 }
 
+/* Style for all input fields */
+input {
+    text-transform: capitalize;
+}
+
+
 
 li img{
     height: 120px;

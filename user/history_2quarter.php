@@ -74,32 +74,8 @@ $con->close();
 }
 
 
-.periodRecord p {
-    font-size: 1.5rem;  /* Adjust the font size here (increase or decrease as needed) */
-    margin-top: 10px;   /* Adjust the space between paragraphs */
-}
 
-/* Optional: Styling for links (if needed) */
-.periodRecord a {
-    text-decoration: none;  /* Remove underline */
-    color: inherit;         /* Ensure the color is consistent */
-}
 
-.main-content {
-    flex-grow: 1; /* Allow content to grow and fill space */
-    padding: 20px;
-}
-
-.footer {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-}
-
-.footer p {
-    font-size: 1rem; /* Adjust the font size as needed */
-    margin: 0;       /* Remove margin */
-}
 
 
 /* Optional media query for smaller screens */
@@ -111,37 +87,33 @@ $con->close();
     .studentdashboard p {
         font-size: 1rem; /* Reduce font size for better fit on small screens */
     }
+}
 
-    .periodRecord p {
-        font-size: 1.2rem;  /* Smaller font size for small screens */
-        margin-top: 8px;    /* Slightly smaller margin */
-    }
+.close-btn {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    font-size: 20px;
+    font-weight: bold; /* Makes the text bold */
+    background-color: transparent;
+    border: none;
+    color: #808080; /* Gray color for the text */
+    cursor: pointer;
+    transition: all 0.3s ease; /* Smooth transition effect */
+}
+
+/* Optional: Change appearance on hover */
+.close-btn:hover {
+    color: #ff0000;  /* Change color to red when hovered */
+    transform: scale(1.1);  /* Slightly enlarge the button */
 }
 
 
-/* Media query for medium screens (tablets, small laptops) */
-@media (max-width: 768px) {
-    .periodRecord p {
-        font-size: 1.3rem;  /* Slightly smaller font size for medium screens */
-        margin-top: 9px;    /* Slightly smaller margin */
-    }
-}
-
-/* Media query for large screens (larger laptops and desktops) */
-@media (min-width: 992px) {
-    .periodRecord p {
-        font-size: 1.5rem;  /* Keep the default size for large screens */
-        margin-top: 10px;   /* Default margin */
-    }
-}
-
-/* Media query for large screens (larger laptops and desktops) */
-@media (min-width: 400px) {
-    .periodRecord p {
-        font-size: 1.5rem;  /* Keep the default size for large screens */
-        margin-top: 10px;   /* Default margin */
-    }
-}
+ /* Container for the table */
+ .transaction {
+            position: relative;
+          
+        }
 
 
 
@@ -196,28 +168,64 @@ $con->close();
     </div>
 
     <div class="periods">
-    <h4>Periods</h4>
-</div>
-
-<div class="periodRecord">
-   
-    <a href="history_4quarter.php"><p>2024-2024 Q4 - All Cleared</p></a>
-    <a href="history_3quarter.php"><p>2024-2024 Q3 - All Cleared</p></a>
-   <a href="history_2quarter.php"><p>2024-2024 Q2 - All Cleared</p></a> 
-   <a href="history_1quarter.php"><p>2024-2024 Q1 - All Cleared</p></a> 
+    <h4>History</h4>
 </div>
 
 
+  <div class="transaction">
+        
+     <!-- Close Button -->
+     <button class="close-btn" onclick="closeTable()">X</button>
+
+<table>
+  <tr>
+    <th>Description</th>
+    <th>AMOUNT PER EXAM</th>
+    <th>REMARKS</th>
+  </tr>
+
+  <tr>
+    <td>Second Quarter</td>
+    <td>php 1,500.00</td>
+    <td><?php echo htmlspecialchars($student['secondQuarter']); ?></td>
+  </tr>
+  <tr>  
+  <tr>
+    <td>Others</td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>School Wifi</td>
+    <td>php 500.00</td>
+    <td>cleared</td>
+  </tr>
+  <tr>
+    <td>Janitorial</td>
+    <td>php 5000.00</td>
+    <td>cleared</td>
+  </tr>
+    <td>Other Mesilenious</td>
+    <td>php 500.00</td>
+    <td>cleared</td>
+  </tr>
+  
+</table>
+</div> 
+
+
+
+
 
 </div>
 
 
 
 
-<!-- Footer -->
-<footer class="footer bg-dark text-light text-center py-2 mt-5">
-    <p>&copy; Carlgeline Gabila & Jessabel Canaway 2024 Capstone. All rights reserved.</p>
-</footer>
+ <!-- Footer -->
+ <footer class="footer bg-dark text-light text-center py-2 mt-5">
+        <p>&copy; Carlgeline Gabila & Jessabel Canaway 2024 Capstone. All rights reserved.</p>
+    </footer>
 
 
     <!-- Logout Modal -->
@@ -231,4 +239,13 @@ $con->close();
 
 </body>
 <script src="javascript/script.js"></script>
+<script>
+    function closeTable() {
+    // Hide the transaction table
+    document.querySelector('.transaction').style.display = 'none';
+    
+    // Redirect to the dashboard page
+    window.location.href = 'dashboard.php';
+}
+    </script>
 </html>

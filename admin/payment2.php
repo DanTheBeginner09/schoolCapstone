@@ -157,6 +157,7 @@ $con->close();
             <div class="text-center">
             <button type="submit" class="btn btn-primary mt-4" <?php echo ($errorMessage ? 'disabled' : ''); ?>>SUBMIT</button>
                 <br>
+                <a href="javascript:history.back()" class="btn btn-secondary mt-3">Return</a>
                 <a href="accounting.php" class="btn btn-secondary mt-3">Back to Search</a>
             </div>
         </form>

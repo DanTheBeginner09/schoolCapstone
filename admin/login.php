@@ -71,6 +71,7 @@ $con->close();
                 <label>PASSWORD</label>
                 <div class="password-container">
                     <input type="password" name="password" class="password" id="password" placeholder="PASSWORD" required>
+                    <span class="toggle-password" id="togglePassword">&#128065;</span> <!-- Eye icon -->
                 </div>
 
                 <button type="submit" name="login" id="loginBtn">Login</button>
@@ -84,4 +85,13 @@ $con->close();
         </div>
     </div>
 </body>
+
+<script>
+    document.getElementById("togglePassword").addEventListener("click", function() {
+        const passwordField = document.getElementById("password");
+        const type = passwordField.getAttribute("type") === "password" ? "text" : "password";
+        passwordField.setAttribute("type", type);
+        this.innerHTML = type === "password" ? "&#128065;" : "👁️";
+    });
+</script>
 </html>

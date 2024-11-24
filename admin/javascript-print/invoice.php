@@ -89,15 +89,18 @@ if (isset($_GET['ID'])) {
           <td>Description</td>
           <td>Remarks</td>
         </tr>
-        <tr class="item">
-          <td>Payment Amount</td>
-          <td><strong> <?php echo htmlspecialchars($student['paymentAmount']); ?></strong></td>
-        </tr>
-        
+
         <tr class="item last">
           <td>Remaining Balance:</td>
           <td><strong> <?php echo htmlspecialchars($student['remainingbalance']); ?></strong></td>
+        </tr> 
+        
+        <tr class="item">
+          <td>Paid Amount</td>
+          <td><strong> <?php echo htmlspecialchars($student['paymentAmount']); ?></strong></td>
         </tr>
+        
+       
      
         <tr class="total">
           <td></td>

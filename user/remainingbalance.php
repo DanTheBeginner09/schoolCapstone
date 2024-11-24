@@ -74,32 +74,55 @@ $con->close();
 }
 
 
-.periodRecord p {
-    font-size: 1.5rem;  /* Adjust the font size here (increase or decrease as needed) */
-    margin-top: 10px;   /* Adjust the space between paragraphs */
+.paymentdashboard p{
+    font-size: 1.5rem;
 }
 
-/* Optional: Styling for links (if needed) */
-.periodRecord a {
-    text-decoration: none;  /* Remove underline */
-    color: inherit;         /* Ensure the color is consistent */
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
 }
 
-.main-content {
-    flex-grow: 1; /* Allow content to grow and fill space */
-    padding: 20px;
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
 }
 
-.footer {
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+
+
+.close-btn {
     position: absolute;
-    bottom: 0;
-    width: 100%;
+    top: 30px;
+    right: 30px;
+    font-size: 20px;
+    font-weight: bold; /* Makes the text bold */
+    background-color: transparent;
+    border: none;
+    color: #808080; /* Gray color for the text */
+    cursor: pointer;
+    transition: all 0.3s ease; /* Smooth transition effect */
 }
 
-.footer p {
-    font-size: 1rem; /* Adjust the font size as needed */
-    margin: 0;       /* Remove margin */
+/* Optional: Change appearance on hover */
+.close-btn:hover {
+    color: #ff0000;  /* Change color to red when hovered */
+    transform: scale(1.1);  /* Slightly enlarge the button */
 }
+
+
+ /* Container for the table */
+ .transaction {
+            position: relative;
+          
+        }
+
+
+
 
 
 /* Optional media query for smaller screens */
@@ -111,37 +134,8 @@ $con->close();
     .studentdashboard p {
         font-size: 1rem; /* Reduce font size for better fit on small screens */
     }
-
-    .periodRecord p {
-        font-size: 1.2rem;  /* Smaller font size for small screens */
-        margin-top: 8px;    /* Slightly smaller margin */
-    }
 }
 
-
-/* Media query for medium screens (tablets, small laptops) */
-@media (max-width: 768px) {
-    .periodRecord p {
-        font-size: 1.3rem;  /* Slightly smaller font size for medium screens */
-        margin-top: 9px;    /* Slightly smaller margin */
-    }
-}
-
-/* Media query for large screens (larger laptops and desktops) */
-@media (min-width: 992px) {
-    .periodRecord p {
-        font-size: 1.5rem;  /* Keep the default size for large screens */
-        margin-top: 10px;   /* Default margin */
-    }
-}
-
-/* Media query for large screens (larger laptops and desktops) */
-@media (min-width: 400px) {
-    .periodRecord p {
-        font-size: 1.5rem;  /* Keep the default size for large screens */
-        margin-top: 10px;   /* Default margin */
-    }
-}
 
 
 
@@ -192,32 +186,33 @@ $con->close();
 
     <div class="paymentdashboard">
     
-    <h3>REMAINING BALANCE/S</h3>
+    <p>PAYMENT RECORDS</p>
     </div>
 
-    <div class="periods">
-    <h4>Periods</h4>
-</div>
+    
 
-<div class="periodRecord">
+<div class="transaction">
+         <!-- Close Button -->
+         <button class="close-btn" onclick="closeTable()">X</button>
+
+  <div class="transaction-item">
    
-    <a href="history_4quarter.php"><p>2024-2024 Q4 - All Cleared</p></a>
-    <a href="history_3quarter.php"><p>2024-2024 Q3 - All Cleared</p></a>
-   <a href="history_2quarter.php"><p>2024-2024 Q2 - All Cleared</p></a> 
-   <a href="history_1quarter.php"><p>2024-2024 Q1 - All Cleared</p></a> 
+    <h2>Remaining Balance <br>Php <?php echo htmlspecialchars($student['remainingbalance']); ?></h2>
+  </div>
+ 
+ 
+</div>
+
+
 </div>
 
 
 
-</div>
 
-
-
-
-<!-- Footer -->
-<footer class="footer bg-dark text-light text-center py-2 mt-5">
-    <p>&copy; Carlgeline Gabila & Jessabel Canaway 2024 Capstone. All rights reserved.</p>
-</footer>
+ <!-- Footer -->
+ <footer class="footer bg-dark text-light text-center py-2 mt-5">
+        <p>&copy; Carlgeline Gabila & Jessabel Canaway 2024 Capstone. All rights reserved.</p>
+    </footer>
 
 
     <!-- Logout Modal -->
@@ -231,4 +226,14 @@ $con->close();
 
 </body>
 <script src="javascript/script.js"></script>
+<script>
+    function closeTable() {
+    // Hide the transaction table
+    document.querySelector('.transaction').style.display = 'none';
+    
+    // Redirect to the dashboard page
+    window.location.href = 'paymentrecord.php';
+}
+    </script>
+
 </html>

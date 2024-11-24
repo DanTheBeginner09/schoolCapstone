@@ -72,3 +72,12 @@ window.addEventListener("resize", adjustDashboard);
 
     // Additional logout modal functionality as previously defined
 
+
+    function closeTable() {
+    // Hide the transaction table
+    document.querySelector('.transaction').style.display = 'none';
+    
+    // Redirect to the dashboard page
+    window.location.href = 'dashboard.php';
+}
+   

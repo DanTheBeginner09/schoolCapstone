@@ -11,7 +11,7 @@ if (!isset($_GET['ID']) || !is_numeric($_GET['ID'])) {
     exit;
 }
 
-$accountID = $_GET['ID'];
+$accountID = intval($_GET['ID']); // Ensure accountID is an integer
 
 // Fetch student details based on accountID
 $sql = "SELECT * FROM students WHERE accountID = ?";
@@ -26,38 +26,9 @@ if (!$student) {
     exit;
 }
 
-// Handle form submission for updating quarter statuses
-$successMessage = "";
-$errorMessage = "";
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $firstQuarter = $_POST['firstQuarter'];
-    $secondQuarter = $_POST['secondQuarter'];
-    $thirdQuarter = $_POST['thirdQuarter'];
-    $fourthQuarter = $_POST['fourthQuarter'];
-
-    // Prepare the SQL query to update quarter statuses
-    $sql_update_quarters = "UPDATE students SET 
-        firstQuarter = ?, 
-        secondQuarter = ?, 
-        thirdQuarter = ?, 
-        fourthQuarter = ? 
-        WHERE accountID = ?";
-    $stmt_update_quarters = $con->prepare($sql_update_quarters);
-    $stmt_update_quarters->bind_param("ssssi", $firstQuarter, $secondQuarter, $thirdQuarter, $fourthQuarter, $accountID);
-
-    if ($stmt_update_quarters->execute()) {
-        $successMessage = "Quarter statuses successfully updated.";
-    } else {
-        $errorMessage = "Error updating quarter statuses. Please try again.";
-    }
-
-    $stmt_update_quarters->close();
-}
-
 $stmt->close();
 $con->close();
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -65,6 +36,7 @@ $con->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>School Fees Management - Clearance Update</title>
     <link rel="stylesheet" href="bootstrap-5.3.3-dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/main.css">
     <style>
         .main-content {
             display: flex;
@@ -73,27 +45,16 @@ $con->close();
             height: 100vh;
             padding: 20px;
         }
-
         .box {
-            margin-top: 50px;
-            width: 80%;
+            width: 100%;
+            max-width: 600px;
             margin: 15px auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
         }
-
-        .alert {
-            padding: 10px;
-            margin-bottom: 20px;
-            font-size: 16px;
-        }
-
-        .btn-custom {
-            background-color: #28a745;
-            border-color: #28a745;
-        }
-
-        .btn-custom:hover {
-            background-color: #218838;
-            border-color: #1e7e34;
+        .clearance-details p {
+            margin-bottom: 8px;
         }
     </style>
 </head>
@@ -101,63 +62,109 @@ $con->close();
 
 <div class="header">
     <div class="mainheader">
-        <p>Web-based School Fees <br><span class="subheading">MANAGEMENT SYSTEM</span></p>
+        <p>Web-based school fees <br><span class="subheading">MANAGEMENT SYSTEM</span></p>
     </div>
 </div>
 
 <div class="main-content">
-    <div class="box">
-        <h3 class="text-center">Clearance Update for: <?php echo htmlspecialchars($student['fname'] . " " . $student['lname']); ?></h3>
+    <div class="box p-4 shadow-sm">
+        <h3 class="text-center mb-4">CLEARANCE UPDATE <br>
 
-        <?php if ($successMessage): ?>
-            <div class="alert alert-success mt-3"><?php echo $successMessage; ?></div>
-        <?php elseif (isset($errorMessage)): ?>
-            <div class="alert alert-danger mt-3"><?php echo $errorMessage; ?></div>
-        <?php endif; ?>
+        </h3>
+
         
-        <form id="clearanceForm" method="POST">
+        <!-- Success/Error Message -->
+<?php if (isset($_GET['success'])): ?>
+    <div id="message" class="alert alert-success text-center">Quarter statuses successfully updated.</div>
+<?php elseif (isset($_GET['error'])): ?>
+    <div id="message" class="alert alert-danger text-center">Error updating quarter statuses. Please try again.</div>
+<?php endif; ?>
 
-            <div class="form-group mt-3">
-                <label for="firstQuarter">First Quarter Status</label>
-                <input type="text" class="form-control" name="firstQuarter" value="<?php echo $student['firstQuarter']; ?>" required>
-            </div>
 
-            <div class="form-group mt-3">
-                <label for="secondQuarter">Second Quarter Status</label>
-                <input type="text" class="form-control" name="secondQuarter" value="<?php echo $student['secondQuarter']; ?>" required>
-            </div>
-
-            <div class="form-group mt-3">
-                <label for="thirdQuarter">Third Quarter Status</label>
-                <input type="text" class="form-control" name="thirdQuarter" value="<?php echo $student['thirdQuarter']; ?>" required>
-            </div>
-
-            <div class="form-group mt-3">
-                <label for="fourthQuarter">Fourth Quarter Status</label>
-                <input type="text" class="form-control" name="fourthQuarter" value="<?php echo $student['fourthQuarter']; ?>" required>
-            </div>
-
-            <div class="text-center mt-4">
-                <button type="button" class="btn btn-custom" id="updateButton">UPDATE CLEARANCE</button>
-            </div>
-        </form>
+        <!-- Clearance Details -->
+        <div class="clearance-details mb-4">
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <p><strong>Student ID:</strong> <?php echo htmlspecialchars($student['studentID']); ?></p>
+        </div>
+        <div class="col-md-6 mb-3">
+            <p><strong>Name:</strong> <?php echo htmlspecialchars($student['fname'] . " " . $student['lname']); ?></p>
+        </div>
+        <div class="col-md-6 mb-3">
+            <p><strong>Tuition:</strong>Php  <?php echo htmlspecialchars($student['totalTuition']); ?></p>
+        </div>
+        <div class="col-md-6 mb-3">
+            <p><strong>Remaining Balance:</strong>Php  <?php echo htmlspecialchars($student['remainingbalance']); ?></p>
+        </div>
+        <div class="col-md-6 mb-3">
+            <p><strong>Per Exam:</strong> Php 3000</p>
+        </div>
+    
+    
         
+    </div>
+    <div class="row">
+    <div class="col-md-3 mb-3">
+        <p><strong>1Q:</strong> <?php echo htmlspecialchars($student['firstQuarter']); ?></p>
+    </div>
+    <div class="col-md-3 mb-3">
+        <p><strong>2Q:</strong> <?php echo htmlspecialchars($student['secondQuarter']); ?></p>
+    </div>
+    <div class="col-md-3 mb-3">
+        <p><strong>3Q:</strong> <?php echo htmlspecialchars($student['thirdQuarter']); ?></p>
+    </div>
+    <div class="col-md-3 mb-3">
+        <p><strong>4Q:</strong> <?php echo htmlspecialchars($student['fourthQuarter']); ?></p>
     </div>
 </div>
 
-<!-- Modal for success message -->
-<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="successModalLabel">Success</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+
+        <!-- Clearance Form -->
+<form method="POST" action="clearance_update.php">
+    <input type="hidden" name="accountID" value="<?php echo htmlspecialchars($accountID); ?>">
+    
+    <div class="row">
+        <?php
+        $quarters = [
+            'firstQuarter' => 'First Quarter',
+            'secondQuarter' => 'Second Quarter',
+            'thirdQuarter' => 'Third Quarter',
+            'fourthQuarter' => 'Fourth Quarter'
+        ];
+        $counter = 0;
+        foreach ($quarters as $field => $label): 
+            // Start a new row after every 2 quarters
+            if ($counter % 2 == 0 && $counter > 0) {
+                echo '</div><div class="row">'; // Close current row and start a new one
+            }
+        ?>
+            <div class="col-md-6 mb-3">
+                <label for="<?php echo $field; ?>"><?php echo $label; ?> </label>
+                <select class="form-control" id="<?php echo $field; ?>" name="<?php echo $field; ?>" required>
+                    <option value="" disabled>Select Option</option>
+                    <option value="Partial" <?php echo ($student[$field] == 'Partial') ? 'selected' : ''; ?>>Partial</option>
+                    <option value="Paid" <?php echo ($student[$field] == 'Paid') ? 'selected' : ''; ?>>Paid</option>
+                    <option value="Not Cleared" <?php echo ($student[$field] == 'Not Cleared') ? 'selected' : ''; ?>>Not Cleared</option>
+                </select>
             </div>
-            <div class="modal-body">
-                Quarter statuses were successfully updated.
-            </div>
-            <div class="modal-footer">
-                <button type="button" id="okButton" class="btn btn-primary">OK</button>
+        <?php 
+            $counter++; 
+        endforeach; 
+        ?>
+    </div>
+
+    <div class="text-center mt-4">
+        <button type="submit" class="btn btn-success w-100">Update Clearance</button>
+    </div>
+</form>
+
+        <!-- Return and Dashboard Buttons -->
+        <div class="row justify-content-center mt-4">
+            
+            <div class="col-auto">
+                <a href="dashboard.php" class="btn btn-primary">Back to Dashboard</a>
             </div>
         </div>
     </div>
@@ -165,20 +172,19 @@ $con->close();
 
 <script src="bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    document.getElementById('updateButton').addEventListener('click', function(event) {
-        event.preventDefault();  // Prevent form submission
+    // Check if the message is present in the DOM
+    window.onload = function() {
+        var message = document.getElementById("message");
+        if (message) {
+            // Show the message if it's present
+            message.style.display = "block";
 
-        // Show the modal
-        var modal = new bootstrap.Modal(document.getElementById('successModal'));
-        modal.show();
-
-        // When the user clicks 'OK', submit the form and redirect
-        document.getElementById('okButton').onclick = function() {
-            // Submit the form after the modal interaction
-            document.getElementById('clearanceForm').submit();
-            window.location.href = 'clearance.php';  // Redirect to clearance.php after form submission
-        };
-    });
+            // Hide the message after 4 seconds
+            setTimeout(function() {
+                message.style.display = "none";
+            }, 4000); // 4 seconds
+        }
+    }
 </script>
 
 </body>
